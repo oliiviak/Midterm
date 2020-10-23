@@ -1,0 +1,981 @@
+{
+ "metadata": {
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.5-final"
+  },
+  "orig_nbformat": 2,
+  "kernelspec": {
+   "name": "Python 3.8.5 64-bit ('base': conda)",
+   "display_name": "Python 3.8.5 64-bit ('base': conda)",
+   "metadata": {
+    "interpreter": {
+     "hash": "208ca50c4d27e81cb3362e837b8987f14388683af36617e2ae3238c5b3da3225"
+    }
+   }
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2,
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import numpy as np"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 41,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.read_csv('/Users/zumiis/bootcamp_git/midterm/mid-term_project/flights_test_official.csv')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 42,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "rr_ref = pd.read_csv('/Users/zumiis/bootcamp_git/midterm/vscode_files/final_final_data_for_model.csv')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 45,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def drop_y(df):\n",
+    "    # list comprehension of the cols that end with '_y'\n",
+    "    to_drop = [x for x in df if x.endswith('_y')]\n",
+    "    df.drop(to_drop, axis=1, inplace=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 46,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "final_data_merged = pd.merge(df, rr_ref,  how='inner', left_on=['mkt_unique_carrier', 'origin_airport_id', 'dest_airport_id', 'distance'], \n",
+    "                                        right_on=['mkt_unique_carrier', 'origin_airport_id', 'dest_airport_id', 'distance'], \n",
+    "                                        suffixes=('', '_y'))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 48,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "drop_y(idk)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 49,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "execute_result",
+     "data": {
+      "text/plain": [
+       "Index(['fl_date', 'mkt_unique_carrier', 'branded_code_share', 'mkt_carrier',\n",
+       "       'mkt_carrier_fl_num', 'op_unique_carrier', 'tail_num',\n",
+       "       'op_carrier_fl_num', 'origin_airport_id', 'origin', 'origin_city_name',\n",
+       "       'dest_airport_id', 'dest', 'dest_city_name', 'crs_dep_time',\n",
+       "       'crs_arr_time', 'dup', 'crs_elapsed_time', 'flights', 'distance',\n",
+       "       'fl_date_y', 'origin_city_name_y', 'origin_y', 'dest_city_name_y',\n",
+       "       'dest_y', 'origin_weather', 'dest_weather', 'op_unique_carrier_y',\n",
+       "       'crs_dep_time_y', 'crs_arr_time_y', 'crs_elapsed_time_y', 'dep_delay',\n",
+       "       'arr_delay', 'arr_delay7', 'arr_delay14', 'arr_rolling7',\n",
+       "       'arr_rolling14', 'dep_delay7', 'dep_delay14', 'dep_rolling7',\n",
+       "       'dep_rolling14', 'quarter', 'year', 'month', 'day', 'avg_delay_carrier',\n",
+       "       'avg_delay_origin_quart', 'avg_delay_dest_quart', 'hour_only_dep',\n",
+       "       'hour_only_arr', 'time_period_dep', 'time_period_arr',\n",
+       "       'traffic_origin_port', 'traffic_dest_port', 'distance_encoded',\n",
+       "       'is_delayed', 'avg_delay_distance', 'dep_time_traffic',\n",
+       "       'arr_time_traffic', 'weather_og_quarter', 'weather_dest_quarter',\n",
+       "       'weather_og_period', 'weather_dest_period', 'weather_og_delay',\n",
+       "       'weather_dest_delay'],\n",
+       "      dtype='object')"
+      ]
+     },
+     "metadata": {},
+     "execution_count": 49
+    }
+   ],
+   "source": [
+    "final_data_merged.columns"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 50,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y_classification_test = pd.DataFrame(final_data_merged['is_delayed'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y_classification_test.to_csv('/Users/zumiis/bootcamp_git/midterm/vscode_files/y_for_classification_test.csv', index=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "execute_result",
+     "data": {
+      "text/plain": [
+       "                          fl_date mkt_unique_carrier branded_code_share  \\\n",
+       "0      2020-01-01 00:00:00.000000                 WN                 WN   \n",
+       "1      2020-01-01 00:00:00.000000                 WN                 WN   \n",
+       "2      2020-01-01 00:00:00.000000                 WN                 WN   \n",
+       "3      2020-01-01 00:00:00.000000                 WN                 WN   \n",
+       "4      2020-01-01 00:00:00.000000                 WN                 WN   \n",
+       "...                           ...                ...                ...   \n",
+       "63376  2020-01-18 00:00:00.000000                 WN                 WN   \n",
+       "63377  2020-01-19 00:00:00.000000                 WN                 WN   \n",
+       "63378  2020-01-25 00:00:00.000000                 WN                 WN   \n",
+       "63379  2020-01-25 00:00:00.000000                 WN                 WN   \n",
+       "63380  2020-01-26 00:00:00.000000                 WN                 WN   \n",
+       "\n",
+       "      mkt_carrier  mkt_carrier_fl_num op_unique_carrier tail_num  \\\n",
+       "0              WN                 611                WN   N210WN   \n",
+       "1              WN                 611                WN   N210WN   \n",
+       "2              WN                 950                WN   N7742B   \n",
+       "3              WN                 950                WN   N7742B   \n",
+       "4              WN                2742                WN   N247WN   \n",
+       "...           ...                 ...               ...      ...   \n",
+       "63376          WN                4813                WN   N922WN   \n",
+       "63377          WN                3969                WN   N8609A   \n",
+       "63378          WN                4684                WN   N8576Z   \n",
+       "63379          WN                4813                WN   N568WN   \n",
+       "63380          WN                3969                WN   N8528Q   \n",
+       "\n",
+       "       op_carrier_fl_num  origin_airport_id origin  ... is_delayed  \\\n",
+       "0                    611              14107    PHX  ...          0   \n",
+       "1                    611              14107    PHX  ...          0   \n",
+       "2                    950              14107    PHX  ...          0   \n",
+       "3                    950              14107    PHX  ...          0   \n",
+       "4                   2742              14107    PHX  ...          0   \n",
+       "...                  ...                ...    ...  ...        ...   \n",
+       "63376               4813              13204    MCO  ...          1   \n",
+       "63377               3969              13204    MCO  ...          1   \n",
+       "63378               4684              13204    MCO  ...          1   \n",
+       "63379               4813              13204    MCO  ...          1   \n",
+       "63380               3969              13204    MCO  ...          1   \n",
+       "\n",
+       "       avg_delay_distance dep_time_traffic arr_time_traffic  \\\n",
+       "0                5.954882         146459.0         106999.0   \n",
+       "1                5.954882         146459.0         106999.0   \n",
+       "2                5.954882         146459.0         106999.0   \n",
+       "3                5.954882         146459.0         106999.0   \n",
+       "4                5.954882         146459.0         106999.0   \n",
+       "...                   ...              ...              ...   \n",
+       "63376            5.313112         146459.0         136037.0   \n",
+       "63377            5.313112         146459.0         136037.0   \n",
+       "63378            5.313112         146459.0         136037.0   \n",
+       "63379            5.313112         146459.0         136037.0   \n",
+       "63380            5.313112         146459.0         136037.0   \n",
+       "\n",
+       "       weather_og_quarter  weather_dest_quarter weather_og_period  \\\n",
+       "0                2.896568              1.809727          2.998350   \n",
+       "1                2.896568              1.809727          2.998350   \n",
+       "2                2.896568              1.809727          2.998350   \n",
+       "3                2.896568              1.809727          2.998350   \n",
+       "4                2.896568              1.809727          2.998350   \n",
+       "...                   ...                   ...               ...   \n",
+       "63376            2.003754              2.766284          2.482585   \n",
+       "63377            2.003754              2.766284          2.482585   \n",
+       "63378            2.003754              2.766284          2.482585   \n",
+       "63379            2.003754              2.766284          2.482585   \n",
+       "63380            2.003754              2.766284          2.482585   \n",
+       "\n",
+       "       weather_dest_period  weather_og_delay  weather_dest_delay  \n",
+       "0                 2.235927          5.739033            5.271765  \n",
+       "1                 2.235927          5.739033            5.271765  \n",
+       "2                 2.235927          5.739033            5.271765  \n",
+       "3                 2.235927          5.739033            5.271765  \n",
+       "4                 2.235927          5.739033            5.271765  \n",
+       "...                    ...               ...                 ...  \n",
+       "63376             2.455529          5.561964            5.271765  \n",
+       "63377             2.455529          5.561964            5.271765  \n",
+       "63378             2.455529          5.561964            5.271765  \n",
+       "63379             2.455529          5.561964            5.271765  \n",
+       "63380             2.455529          5.561964            5.271765  \n",
+       "\n",
+       "[63381 rows x 65 columns]"
+      ],
+      "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>fl_date</th>\n      <th>mkt_unique_carrier</th>\n      <th>branded_code_share</th>\n      <th>mkt_carrier</th>\n      <th>mkt_carrier_fl_num</th>\n      <th>op_unique_carrier</th>\n      <th>tail_num</th>\n      <th>op_carrier_fl_num</th>\n      <th>origin_airport_id</th>\n      <th>origin</th>\n      <th>...</th>\n      <th>is_delayed</th>\n      <th>avg_delay_distance</th>\n      <th>dep_time_traffic</th>\n      <th>arr_time_traffic</th>\n      <th>weather_og_quarter</th>\n      <th>weather_dest_quarter</th>\n      <th>weather_og_period</th>\n      <th>weather_dest_period</th>\n      <th>weather_og_delay</th>\n      <th>weather_dest_delay</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>2020-01-01 00:00:00.000000</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>611</td>\n      <td>WN</td>\n      <td>N210WN</td>\n      <td>611</td>\n      <td>14107</td>\n      <td>PHX</td>\n      <td>...</td>\n      <td>0</td>\n      <td>5.954882</td>\n      <td>146459.0</td>\n      <td>106999.0</td>\n      <td>2.896568</td>\n      <td>1.809727</td>\n      <td>2.998350</td>\n      <td>2.235927</td>\n      <td>5.739033</td>\n      <td>5.271765</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>2020-01-01 00:00:00.000000</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>611</td>\n      <td>WN</td>\n      <td>N210WN</td>\n      <td>611</td>\n      <td>14107</td>\n      <td>PHX</td>\n      <td>...</td>\n      <td>0</td>\n      <td>5.954882</td>\n      <td>146459.0</td>\n      <td>106999.0</td>\n      <td>2.896568</td>\n      <td>1.809727</td>\n      <td>2.998350</td>\n      <td>2.235927</td>\n      <td>5.739033</td>\n      <td>5.271765</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>2020-01-01 00:00:00.000000</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>950</td>\n      <td>WN</td>\n      <td>N7742B</td>\n      <td>950</td>\n      <td>14107</td>\n      <td>PHX</td>\n      <td>...</td>\n      <td>0</td>\n      <td>5.954882</td>\n      <td>146459.0</td>\n      <td>106999.0</td>\n      <td>2.896568</td>\n      <td>1.809727</td>\n      <td>2.998350</td>\n      <td>2.235927</td>\n      <td>5.739033</td>\n      <td>5.271765</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>2020-01-01 00:00:00.000000</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>950</td>\n      <td>WN</td>\n      <td>N7742B</td>\n      <td>950</td>\n      <td>14107</td>\n      <td>PHX</td>\n      <td>...</td>\n      <td>0</td>\n      <td>5.954882</td>\n      <td>146459.0</td>\n      <td>106999.0</td>\n      <td>2.896568</td>\n      <td>1.809727</td>\n      <td>2.998350</td>\n      <td>2.235927</td>\n      <td>5.739033</td>\n      <td>5.271765</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>2020-01-01 00:00:00.000000</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>2742</td>\n      <td>WN</td>\n      <td>N247WN</td>\n      <td>2742</td>\n      <td>14107</td>\n      <td>PHX</td>\n      <td>...</td>\n      <td>0</td>\n      <td>5.954882</td>\n      <td>146459.0</td>\n      <td>106999.0</td>\n      <td>2.896568</td>\n      <td>1.809727</td>\n      <td>2.998350</td>\n      <td>2.235927</td>\n      <td>5.739033</td>\n      <td>5.271765</td>\n    </tr>\n    <tr>\n      <th>...</th>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n    </tr>\n    <tr>\n      <th>63376</th>\n      <td>2020-01-18 00:00:00.000000</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>4813</td>\n      <td>WN</td>\n      <td>N922WN</td>\n      <td>4813</td>\n      <td>13204</td>\n      <td>MCO</td>\n      <td>...</td>\n      <td>1</td>\n      <td>5.313112</td>\n      <td>146459.0</td>\n      <td>136037.0</td>\n      <td>2.003754</td>\n      <td>2.766284</td>\n      <td>2.482585</td>\n      <td>2.455529</td>\n      <td>5.561964</td>\n      <td>5.271765</td>\n    </tr>\n    <tr>\n      <th>63377</th>\n      <td>2020-01-19 00:00:00.000000</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>3969</td>\n      <td>WN</td>\n      <td>N8609A</td>\n      <td>3969</td>\n      <td>13204</td>\n      <td>MCO</td>\n      <td>...</td>\n      <td>1</td>\n      <td>5.313112</td>\n      <td>146459.0</td>\n      <td>136037.0</td>\n      <td>2.003754</td>\n      <td>2.766284</td>\n      <td>2.482585</td>\n      <td>2.455529</td>\n      <td>5.561964</td>\n      <td>5.271765</td>\n    </tr>\n    <tr>\n      <th>63378</th>\n      <td>2020-01-25 00:00:00.000000</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>4684</td>\n      <td>WN</td>\n      <td>N8576Z</td>\n      <td>4684</td>\n      <td>13204</td>\n      <td>MCO</td>\n      <td>...</td>\n      <td>1</td>\n      <td>5.313112</td>\n      <td>146459.0</td>\n      <td>136037.0</td>\n      <td>2.003754</td>\n      <td>2.766284</td>\n      <td>2.482585</td>\n      <td>2.455529</td>\n      <td>5.561964</td>\n      <td>5.271765</td>\n    </tr>\n    <tr>\n      <th>63379</th>\n      <td>2020-01-25 00:00:00.000000</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>4813</td>\n      <td>WN</td>\n      <td>N568WN</td>\n      <td>4813</td>\n      <td>13204</td>\n      <td>MCO</td>\n      <td>...</td>\n      <td>1</td>\n      <td>5.313112</td>\n      <td>146459.0</td>\n      <td>136037.0</td>\n      <td>2.003754</td>\n      <td>2.766284</td>\n      <td>2.482585</td>\n      <td>2.455529</td>\n      <td>5.561964</td>\n      <td>5.271765</td>\n    </tr>\n    <tr>\n      <th>63380</th>\n      <td>2020-01-26 00:00:00.000000</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>WN</td>\n      <td>3969</td>\n      <td>WN</td>\n      <td>N8528Q</td>\n      <td>3969</td>\n      <td>13204</td>\n      <td>MCO</td>\n      <td>...</td>\n      <td>1</td>\n      <td>5.313112</td>\n      <td>146459.0</td>\n      <td>136037.0</td>\n      <td>2.003754</td>\n      <td>2.766284</td>\n      <td>2.482585</td>\n      <td>2.455529</td>\n      <td>5.561964</td>\n      <td>5.271765</td>\n    </tr>\n  </tbody>\n</table>\n<p>63381 rows × 65 columns</p>\n</div>"
+     },
+     "metadata": {},
+     "execution_count": 52
+    }
+   ],
+   "source": [
+    "final_data_merged"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 54,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y = pd.DataFrame(final_data_merged['arr_delay'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y.to_csv('/Users/zumiis/bootcamp_git/midterm/vscode_files/testing_y.csv')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 57,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.model_selection import cross_val_score, GridSearchCV\n",
+    "from sklearn.ensemble import RandomForestRegressor\n",
+    "from sklearn.preprocessing import MinMaxScaler"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 58,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "reg_ref_table = final_data_merged.copy()"
+   ]
+  },
+  {
+   "source": [
+    "### PCA ##"
+   ],
+   "cell_type": "markdown",
+   "metadata": {}
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 59,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "reg_features = ['fl_date', 'mkt_unique_carrier', 'origin_city_name', 'dest_city_name', 'crs_dep_time']\n",
+    "reg_test_sample= final_data_merged[reg_features]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 60,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "execute_result",
+     "data": {
+      "text/plain": [
+       "                          fl_date mkt_unique_carrier origin_city_name  \\\n",
+       "0      2020-01-01 00:00:00.000000                 WN      Phoenix, AZ   \n",
+       "1      2020-01-01 00:00:00.000000                 WN      Phoenix, AZ   \n",
+       "2      2020-01-01 00:00:00.000000                 WN      Phoenix, AZ   \n",
+       "3      2020-01-01 00:00:00.000000                 WN      Phoenix, AZ   \n",
+       "4      2020-01-01 00:00:00.000000                 WN      Phoenix, AZ   \n",
+       "...                           ...                ...              ...   \n",
+       "63376  2020-01-18 00:00:00.000000                 WN      Orlando, FL   \n",
+       "63377  2020-01-19 00:00:00.000000                 WN      Orlando, FL   \n",
+       "63378  2020-01-25 00:00:00.000000                 WN      Orlando, FL   \n",
+       "63379  2020-01-25 00:00:00.000000                 WN      Orlando, FL   \n",
+       "63380  2020-01-26 00:00:00.000000                 WN      Orlando, FL   \n",
+       "\n",
+       "      dest_city_name  crs_dep_time  \n",
+       "0         Denver, CO          2250  \n",
+       "1         Denver, CO          2250  \n",
+       "2         Denver, CO          1835  \n",
+       "3         Denver, CO          1835  \n",
+       "4         Denver, CO          1945  \n",
+       "...              ...           ...  \n",
+       "63376  Cleveland, OH          1205  \n",
+       "63377  Cleveland, OH          1100  \n",
+       "63378  Cleveland, OH          1805  \n",
+       "63379  Cleveland, OH          1205  \n",
+       "63380  Cleveland, OH          1100  \n",
+       "\n",
+       "[63381 rows x 5 columns]"
+      ],
+      "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>fl_date</th>\n      <th>mkt_unique_carrier</th>\n      <th>origin_city_name</th>\n      <th>dest_city_name</th>\n      <th>crs_dep_time</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>2020-01-01 00:00:00.000000</td>\n      <td>WN</td>\n      <td>Phoenix, AZ</td>\n      <td>Denver, CO</td>\n      <td>2250</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>2020-01-01 00:00:00.000000</td>\n      <td>WN</td>\n      <td>Phoenix, AZ</td>\n      <td>Denver, CO</td>\n      <td>2250</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>2020-01-01 00:00:00.000000</td>\n      <td>WN</td>\n      <td>Phoenix, AZ</td>\n      <td>Denver, CO</td>\n      <td>1835</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>2020-01-01 00:00:00.000000</td>\n      <td>WN</td>\n      <td>Phoenix, AZ</td>\n      <td>Denver, CO</td>\n      <td>1835</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>2020-01-01 00:00:00.000000</td>\n      <td>WN</td>\n      <td>Phoenix, AZ</td>\n      <td>Denver, CO</td>\n      <td>1945</td>\n    </tr>\n    <tr>\n      <th>...</th>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n    </tr>\n    <tr>\n      <th>63376</th>\n      <td>2020-01-18 00:00:00.000000</td>\n      <td>WN</td>\n      <td>Orlando, FL</td>\n      <td>Cleveland, OH</td>\n      <td>1205</td>\n    </tr>\n    <tr>\n      <th>63377</th>\n      <td>2020-01-19 00:00:00.000000</td>\n      <td>WN</td>\n      <td>Orlando, FL</td>\n      <td>Cleveland, OH</td>\n      <td>1100</td>\n    </tr>\n    <tr>\n      <th>63378</th>\n      <td>2020-01-25 00:00:00.000000</td>\n      <td>WN</td>\n      <td>Orlando, FL</td>\n      <td>Cleveland, OH</td>\n      <td>1805</td>\n    </tr>\n    <tr>\n      <th>63379</th>\n      <td>2020-01-25 00:00:00.000000</td>\n      <td>WN</td>\n      <td>Orlando, FL</td>\n      <td>Cleveland, OH</td>\n      <td>1205</td>\n    </tr>\n    <tr>\n      <th>63380</th>\n      <td>2020-01-26 00:00:00.000000</td>\n      <td>WN</td>\n      <td>Orlando, FL</td>\n      <td>Cleveland, OH</td>\n      <td>1100</td>\n    </tr>\n  </tbody>\n</table>\n<p>63381 rows × 5 columns</p>\n</div>"
+     },
+     "metadata": {},
+     "execution_count": 60
+    }
+   ],
+   "source": [
+    "reg_test_sample"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 62,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "reg_test_sample = pd.concat([reg_test_sample, final_data_merged[['arr_delay7', 'arr_delay14', 'arr_rolling7', 'arr_rolling14',\n",
+    "       'dep_delay7', 'dep_delay14', 'dep_rolling7', 'dep_rolling14', 'quarter',\n",
+    "       'year', 'month', 'day', 'avg_delay_carrier', 'avg_delay_origin_quart',\n",
+    "       'avg_delay_dest_quart', 'hour_only_dep', 'hour_only_arr',\n",
+    "       'time_period_dep', 'time_period_arr', 'traffic_origin_port',\n",
+    "       'traffic_dest_port', 'distance_encoded', \n",
+    "       'avg_delay_distance', 'dep_time_traffic', 'arr_time_traffic',\n",
+    "       'weather_og_quarter', 'weather_dest_quarter', 'weather_og_period',\n",
+    "       'weather_dest_period', 'weather_og_delay', 'weather_dest_delay']]], axis=1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 64,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "reg_test_sample = reg_test_sample.dropna()\n",
+    "reg_ref_table = reg_ref_table.dropna()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 65,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "dummies = pd.get_dummies(reg_test_sample[['mkt_unique_carrier','origin_city_name','dest_city_name']])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 67,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "reg_test_sample = pd.concat([reg_test_sample,dummies],axis = 1 )\n",
+    "reg_test_sample = reg_test_sample.drop(['mkt_unique_carrier','origin_city_name','dest_city_name','fl_date', 'crs_dep_time'],axis=1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 68,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "execute_result",
+     "data": {
+      "text/plain": [
+       "       arr_delay7  arr_delay14  arr_rolling7  arr_rolling14  dep_delay7  \\\n",
+       "0             1.0         -9.0      1.285714       1.571429        -1.0   \n",
+       "1           -19.0         13.0     13.428571      11.000000        -5.0   \n",
+       "2             1.0         -9.0      1.285714       1.571429        -1.0   \n",
+       "3           -19.0         13.0     13.428571      11.000000        -5.0   \n",
+       "4             1.0         -9.0      1.285714       1.571429        -1.0   \n",
+       "...           ...          ...           ...            ...         ...   \n",
+       "63376        32.0        -15.0      0.428571       3.571429        11.0   \n",
+       "63377        32.0        -15.0      0.428571       3.571429        11.0   \n",
+       "63378        32.0        -15.0      0.428571       3.571429        11.0   \n",
+       "63379        32.0        -15.0      0.428571       3.571429        11.0   \n",
+       "63380        32.0        -15.0      0.428571       3.571429        11.0   \n",
+       "\n",
+       "       dep_delay14  dep_rolling7  dep_rolling14  quarter  year  ...  \\\n",
+       "0             -8.0      6.000000       4.714286        1  2019  ...   \n",
+       "1              6.0      9.857143       9.500000        1  2019  ...   \n",
+       "2             -8.0      6.000000       4.714286        1  2019  ...   \n",
+       "3              6.0      9.857143       9.500000        1  2019  ...   \n",
+       "4             -8.0      6.000000       4.714286        1  2019  ...   \n",
+       "...            ...           ...            ...      ...   ...  ...   \n",
+       "63376         -5.0      6.428571      10.571429        3  2018  ...   \n",
+       "63377         -5.0      6.428571      10.571429        3  2018  ...   \n",
+       "63378         -5.0      6.428571      10.571429        3  2018  ...   \n",
+       "63379         -5.0      6.428571      10.571429        3  2018  ...   \n",
+       "63380         -5.0      6.428571      10.571429        3  2018  ...   \n",
+       "\n",
+       "       dest_city_name_Savannah, GA  dest_city_name_Seattle, WA  \\\n",
+       "0                                0                           0   \n",
+       "1                                0                           0   \n",
+       "2                                0                           0   \n",
+       "3                                0                           0   \n",
+       "4                                0                           0   \n",
+       "...                            ...                         ...   \n",
+       "63376                            0                           0   \n",
+       "63377                            0                           0   \n",
+       "63378                            0                           0   \n",
+       "63379                            0                           0   \n",
+       "63380                            0                           0   \n",
+       "\n",
+       "       dest_city_name_St. Louis, MO  dest_city_name_Syracuse, NY  \\\n",
+       "0                                 0                            0   \n",
+       "1                                 0                            0   \n",
+       "2                                 0                            0   \n",
+       "3                                 0                            0   \n",
+       "4                                 0                            0   \n",
+       "...                             ...                          ...   \n",
+       "63376                             0                            0   \n",
+       "63377                             0                            0   \n",
+       "63378                             0                            0   \n",
+       "63379                             0                            0   \n",
+       "63380                             0                            0   \n",
+       "\n",
+       "       dest_city_name_Tallahassee, FL  dest_city_name_Tucson, AZ  \\\n",
+       "0                                   0                          0   \n",
+       "1                                   0                          0   \n",
+       "2                                   0                          0   \n",
+       "3                                   0                          0   \n",
+       "4                                   0                          0   \n",
+       "...                               ...                        ...   \n",
+       "63376                               0                          0   \n",
+       "63377                               0                          0   \n",
+       "63378                               0                          0   \n",
+       "63379                               0                          0   \n",
+       "63380                               0                          0   \n",
+       "\n",
+       "       dest_city_name_Washington, DC  \\\n",
+       "0                                  0   \n",
+       "1                                  0   \n",
+       "2                                  0   \n",
+       "3                                  0   \n",
+       "4                                  0   \n",
+       "...                              ...   \n",
+       "63376                              0   \n",
+       "63377                              0   \n",
+       "63378                              0   \n",
+       "63379                              0   \n",
+       "63380                              0   \n",
+       "\n",
+       "       dest_city_name_West Palm Beach/Palm Beach, FL  \\\n",
+       "0                                                  0   \n",
+       "1                                                  0   \n",
+       "2                                                  0   \n",
+       "3                                                  0   \n",
+       "4                                                  0   \n",
+       "...                                              ...   \n",
+       "63376                                              0   \n",
+       "63377                                              0   \n",
+       "63378                                              0   \n",
+       "63379                                              0   \n",
+       "63380                                              0   \n",
+       "\n",
+       "       dest_city_name_White Plains, NY  dest_city_name_Wilmington, NC  \n",
+       "0                                    0                              0  \n",
+       "1                                    0                              0  \n",
+       "2                                    0                              0  \n",
+       "3                                    0                              0  \n",
+       "4                                    0                              0  \n",
+       "...                                ...                            ...  \n",
+       "63376                                0                              0  \n",
+       "63377                                0                              0  \n",
+       "63378                                0                              0  \n",
+       "63379                                0                              0  \n",
+       "63380                                0                              0  \n",
+       "\n",
+       "[63381 rows x 185 columns]"
+      ],
+      "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>arr_delay7</th>\n      <th>arr_delay14</th>\n      <th>arr_rolling7</th>\n      <th>arr_rolling14</th>\n      <th>dep_delay7</th>\n      <th>dep_delay14</th>\n      <th>dep_rolling7</th>\n      <th>dep_rolling14</th>\n      <th>quarter</th>\n      <th>year</th>\n      <th>...</th>\n      <th>dest_city_name_Savannah, GA</th>\n      <th>dest_city_name_Seattle, WA</th>\n      <th>dest_city_name_St. Louis, MO</th>\n      <th>dest_city_name_Syracuse, NY</th>\n      <th>dest_city_name_Tallahassee, FL</th>\n      <th>dest_city_name_Tucson, AZ</th>\n      <th>dest_city_name_Washington, DC</th>\n      <th>dest_city_name_West Palm Beach/Palm Beach, FL</th>\n      <th>dest_city_name_White Plains, NY</th>\n      <th>dest_city_name_Wilmington, NC</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>1.0</td>\n      <td>-9.0</td>\n      <td>1.285714</td>\n      <td>1.571429</td>\n      <td>-1.0</td>\n      <td>-8.0</td>\n      <td>6.000000</td>\n      <td>4.714286</td>\n      <td>1</td>\n      <td>2019</td>\n      <td>...</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>-19.0</td>\n      <td>13.0</td>\n      <td>13.428571</td>\n      <td>11.000000</td>\n      <td>-5.0</td>\n      <td>6.0</td>\n      <td>9.857143</td>\n      <td>9.500000</td>\n      <td>1</td>\n      <td>2019</td>\n      <td>...</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>1.0</td>\n      <td>-9.0</td>\n      <td>1.285714</td>\n      <td>1.571429</td>\n      <td>-1.0</td>\n      <td>-8.0</td>\n      <td>6.000000</td>\n      <td>4.714286</td>\n      <td>1</td>\n      <td>2019</td>\n      <td>...</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>-19.0</td>\n      <td>13.0</td>\n      <td>13.428571</td>\n      <td>11.000000</td>\n      <td>-5.0</td>\n      <td>6.0</td>\n      <td>9.857143</td>\n      <td>9.500000</td>\n      <td>1</td>\n      <td>2019</td>\n      <td>...</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>1.0</td>\n      <td>-9.0</td>\n      <td>1.285714</td>\n      <td>1.571429</td>\n      <td>-1.0</td>\n      <td>-8.0</td>\n      <td>6.000000</td>\n      <td>4.714286</td>\n      <td>1</td>\n      <td>2019</td>\n      <td>...</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n    </tr>\n    <tr>\n      <th>...</th>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n    </tr>\n    <tr>\n      <th>63376</th>\n      <td>32.0</td>\n      <td>-15.0</td>\n      <td>0.428571</td>\n      <td>3.571429</td>\n      <td>11.0</td>\n      <td>-5.0</td>\n      <td>6.428571</td>\n      <td>10.571429</td>\n      <td>3</td>\n      <td>2018</td>\n      <td>...</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n    </tr>\n    <tr>\n      <th>63377</th>\n      <td>32.0</td>\n      <td>-15.0</td>\n      <td>0.428571</td>\n      <td>3.571429</td>\n      <td>11.0</td>\n      <td>-5.0</td>\n      <td>6.428571</td>\n      <td>10.571429</td>\n      <td>3</td>\n      <td>2018</td>\n      <td>...</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n    </tr>\n    <tr>\n      <th>63378</th>\n      <td>32.0</td>\n      <td>-15.0</td>\n      <td>0.428571</td>\n      <td>3.571429</td>\n      <td>11.0</td>\n      <td>-5.0</td>\n      <td>6.428571</td>\n      <td>10.571429</td>\n      <td>3</td>\n      <td>2018</td>\n      <td>...</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n    </tr>\n    <tr>\n      <th>63379</th>\n      <td>32.0</td>\n      <td>-15.0</td>\n      <td>0.428571</td>\n      <td>3.571429</td>\n      <td>11.0</td>\n      <td>-5.0</td>\n      <td>6.428571</td>\n      <td>10.571429</td>\n      <td>3</td>\n      <td>2018</td>\n      <td>...</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n    </tr>\n    <tr>\n      <th>63380</th>\n      <td>32.0</td>\n      <td>-15.0</td>\n      <td>0.428571</td>\n      <td>3.571429</td>\n      <td>11.0</td>\n      <td>-5.0</td>\n      <td>6.428571</td>\n      <td>10.571429</td>\n      <td>3</td>\n      <td>2018</td>\n      <td>...</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n    </tr>\n  </tbody>\n</table>\n<p>63381 rows × 185 columns</p>\n</div>"
+     },
+     "metadata": {},
+     "execution_count": 68
+    }
+   ],
+   "source": [
+    "reg_test_sample"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 69,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "reg_test_sample = reg_test_sample.reset_index().drop(columns='index')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 71,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.decomposition import PCA\n",
+    "from sklearn.preprocessing import StandardScaler\n",
+    "scaler = StandardScaler()\n",
+    "NumPercent = scaler.fit_transform(reg_test_sample[['arr_delay7', 'arr_delay14', 'arr_rolling7', 'arr_rolling14',\n",
+    "       'dep_delay7', 'dep_delay14', 'dep_rolling7', 'dep_rolling14', 'quarter',\n",
+    "       'year', 'month', 'day', 'avg_delay_carrier', 'avg_delay_origin_quart',\n",
+    "       'avg_delay_dest_quart', 'hour_only_dep', 'hour_only_arr',\n",
+    "       'time_period_dep', 'time_period_arr', 'traffic_origin_port',\n",
+    "       'traffic_dest_port', 'distance_encoded', \n",
+    "       'avg_delay_distance', 'dep_time_traffic', 'arr_time_traffic',\n",
+    "       'weather_og_quarter', 'weather_dest_quarter', 'weather_og_period',\n",
+    "       'weather_dest_period', 'weather_og_delay', 'weather_dest_delay']])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 72,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "execute_result",
+     "data": {
+      "text/plain": [
+       "   arr_delay7  arr_delay14  arr_rolling7  arr_rolling14  dep_delay7  \\\n",
+       "0   -0.093421    -0.337246     -0.243992      -0.326420   -0.215769   \n",
+       "1   -0.418903     0.376000      0.211116       0.254362   -0.283267   \n",
+       "2   -0.093421    -0.337246     -0.243992      -0.326420   -0.215769   \n",
+       "3   -0.418903     0.376000      0.211116       0.254362   -0.283267   \n",
+       "4   -0.093421    -0.337246     -0.243992      -0.326420   -0.215769   \n",
+       "\n",
+       "   dep_delay14  dep_rolling7  dep_rolling14   quarter      year  ...  \\\n",
+       "0    -0.488046     -0.266696      -0.478618 -1.278556  1.072739  ...   \n",
+       "1     0.009646     -0.118129      -0.171000 -1.278556  1.072739  ...   \n",
+       "2    -0.488046     -0.266696      -0.478618 -1.278556  1.072739  ...   \n",
+       "3     0.009646     -0.118129      -0.171000 -1.278556  1.072739  ...   \n",
+       "4    -0.488046     -0.266696      -0.478618 -1.278556  1.072739  ...   \n",
+       "\n",
+       "   distance_encoded  avg_delay_distance  dep_time_traffic  arr_time_traffic  \\\n",
+       "0          -0.70668             0.70668          0.722604         -0.614565   \n",
+       "1          -0.70668             0.70668          0.722604         -0.614565   \n",
+       "2          -0.70668             0.70668          0.722604         -0.614565   \n",
+       "3          -0.70668             0.70668          0.722604         -0.614565   \n",
+       "4          -0.70668             0.70668          0.722604         -0.614565   \n",
+       "\n",
+       "   weather_og_quarter  weather_dest_quarter  weather_og_period  \\\n",
+       "0            0.400293             -1.260668           0.622515   \n",
+       "1            0.400293             -1.260668           0.622515   \n",
+       "2            0.400293             -1.260668           0.622515   \n",
+       "3            0.400293             -1.260668           0.622515   \n",
+       "4            0.400293             -1.260668           0.622515   \n",
+       "\n",
+       "   weather_dest_period  weather_og_delay  weather_dest_delay  \n",
+       "0            -0.707498          0.066915           -1.068906  \n",
+       "1            -0.707498          0.066915           -1.068906  \n",
+       "2            -0.707498          0.066915           -1.068906  \n",
+       "3            -0.707498          0.066915           -1.068906  \n",
+       "4            -0.707498          0.066915           -1.068906  \n",
+       "\n",
+       "[5 rows x 31 columns]"
+      ],
+      "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>arr_delay7</th>\n      <th>arr_delay14</th>\n      <th>arr_rolling7</th>\n      <th>arr_rolling14</th>\n      <th>dep_delay7</th>\n      <th>dep_delay14</th>\n      <th>dep_rolling7</th>\n      <th>dep_rolling14</th>\n      <th>quarter</th>\n      <th>year</th>\n      <th>...</th>\n      <th>distance_encoded</th>\n      <th>avg_delay_distance</th>\n      <th>dep_time_traffic</th>\n      <th>arr_time_traffic</th>\n      <th>weather_og_quarter</th>\n      <th>weather_dest_quarter</th>\n      <th>weather_og_period</th>\n      <th>weather_dest_period</th>\n      <th>weather_og_delay</th>\n      <th>weather_dest_delay</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>-0.093421</td>\n      <td>-0.337246</td>\n      <td>-0.243992</td>\n      <td>-0.326420</td>\n      <td>-0.215769</td>\n      <td>-0.488046</td>\n      <td>-0.266696</td>\n      <td>-0.478618</td>\n      <td>-1.278556</td>\n      <td>1.072739</td>\n      <td>...</td>\n      <td>-0.70668</td>\n      <td>0.70668</td>\n      <td>0.722604</td>\n      <td>-0.614565</td>\n      <td>0.400293</td>\n      <td>-1.260668</td>\n      <td>0.622515</td>\n      <td>-0.707498</td>\n      <td>0.066915</td>\n      <td>-1.068906</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>-0.418903</td>\n      <td>0.376000</td>\n      <td>0.211116</td>\n      <td>0.254362</td>\n      <td>-0.283267</td>\n      <td>0.009646</td>\n      <td>-0.118129</td>\n      <td>-0.171000</td>\n      <td>-1.278556</td>\n      <td>1.072739</td>\n      <td>...</td>\n      <td>-0.70668</td>\n      <td>0.70668</td>\n      <td>0.722604</td>\n      <td>-0.614565</td>\n      <td>0.400293</td>\n      <td>-1.260668</td>\n      <td>0.622515</td>\n      <td>-0.707498</td>\n      <td>0.066915</td>\n      <td>-1.068906</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>-0.093421</td>\n      <td>-0.337246</td>\n      <td>-0.243992</td>\n      <td>-0.326420</td>\n      <td>-0.215769</td>\n      <td>-0.488046</td>\n      <td>-0.266696</td>\n      <td>-0.478618</td>\n      <td>-1.278556</td>\n      <td>1.072739</td>\n      <td>...</td>\n      <td>-0.70668</td>\n      <td>0.70668</td>\n      <td>0.722604</td>\n      <td>-0.614565</td>\n      <td>0.400293</td>\n      <td>-1.260668</td>\n      <td>0.622515</td>\n      <td>-0.707498</td>\n      <td>0.066915</td>\n      <td>-1.068906</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>-0.418903</td>\n      <td>0.376000</td>\n      <td>0.211116</td>\n      <td>0.254362</td>\n      <td>-0.283267</td>\n      <td>0.009646</td>\n      <td>-0.118129</td>\n      <td>-0.171000</td>\n      <td>-1.278556</td>\n      <td>1.072739</td>\n      <td>...</td>\n      <td>-0.70668</td>\n      <td>0.70668</td>\n      <td>0.722604</td>\n      <td>-0.614565</td>\n      <td>0.400293</td>\n      <td>-1.260668</td>\n      <td>0.622515</td>\n      <td>-0.707498</td>\n      <td>0.066915</td>\n      <td>-1.068906</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>-0.093421</td>\n      <td>-0.337246</td>\n      <td>-0.243992</td>\n      <td>-0.326420</td>\n      <td>-0.215769</td>\n      <td>-0.488046</td>\n      <td>-0.266696</td>\n      <td>-0.478618</td>\n      <td>-1.278556</td>\n      <td>1.072739</td>\n      <td>...</td>\n      <td>-0.70668</td>\n      <td>0.70668</td>\n      <td>0.722604</td>\n      <td>-0.614565</td>\n      <td>0.400293</td>\n      <td>-1.260668</td>\n      <td>0.622515</td>\n      <td>-0.707498</td>\n      <td>0.066915</td>\n      <td>-1.068906</td>\n    </tr>\n  </tbody>\n</table>\n<p>5 rows × 31 columns</p>\n</div>"
+     },
+     "metadata": {},
+     "execution_count": 72
+    }
+   ],
+   "source": [
+    "reg_test_scaled = pd.DataFrame(NumPercent,columns=['arr_delay7', 'arr_delay14', 'arr_rolling7', 'arr_rolling14',\n",
+    "       'dep_delay7', 'dep_delay14', 'dep_rolling7', 'dep_rolling14', 'quarter',\n",
+    "       'year', 'month', 'day', 'avg_delay_carrier', 'avg_delay_origin_quart',\n",
+    "       'avg_delay_dest_quart', 'hour_only_dep', 'hour_only_arr',\n",
+    "       'time_period_dep', 'time_period_arr', 'traffic_origin_port',\n",
+    "       'traffic_dest_port', 'distance_encoded', \n",
+    "       'avg_delay_distance', 'dep_time_traffic', 'arr_time_traffic',\n",
+    "       'weather_og_quarter', 'weather_dest_quarter', 'weather_og_period',\n",
+    "       'weather_dest_period', 'weather_og_delay', 'weather_dest_delay'])\n",
+    "reg_test_scaled.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 73,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "reg_test_sample2 = reg_test_sample.drop(columns=['arr_delay7', 'arr_delay14', 'arr_rolling7', 'arr_rolling14',\n",
+    "       'dep_delay7', 'dep_delay14', 'dep_rolling7', 'dep_rolling14', 'quarter',\n",
+    "       'year', 'month', 'day', 'avg_delay_carrier', 'avg_delay_origin_quart',\n",
+    "       'avg_delay_dest_quart', 'hour_only_dep', 'hour_only_arr',\n",
+    "       'time_period_dep', 'time_period_arr', 'traffic_origin_port',\n",
+    "       'traffic_dest_port', 'distance_encoded', \n",
+    "       'avg_delay_distance', 'dep_time_traffic', 'arr_time_traffic',\n",
+    "       'weather_og_quarter', 'weather_dest_quarter', 'weather_og_period',\n",
+    "       'weather_dest_period', 'weather_og_delay', 'weather_dest_delay']).copy()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 74,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "reg_test_scaled.reset_index(drop=True, inplace=True)\n",
+    "reg_test_sample.reset_index(drop=True, inplace=True)\n",
+    "reg_test_PCA = pd.concat([reg_test_sample2,reg_test_scaled],axis=1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 75,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "execute_result",
+     "data": {
+      "text/plain": [
+       "Index(['mkt_unique_carrier_AA', 'mkt_unique_carrier_AS',\n",
+       "       'mkt_unique_carrier_B6', 'mkt_unique_carrier_DL',\n",
+       "       'mkt_unique_carrier_F9', 'mkt_unique_carrier_G4',\n",
+       "       'mkt_unique_carrier_HA', 'mkt_unique_carrier_NK',\n",
+       "       'mkt_unique_carrier_UA', 'mkt_unique_carrier_WN',\n",
+       "       ...\n",
+       "       'distance_encoded', 'avg_delay_distance', 'dep_time_traffic',\n",
+       "       'arr_time_traffic', 'weather_og_quarter', 'weather_dest_quarter',\n",
+       "       'weather_og_period', 'weather_dest_period', 'weather_og_delay',\n",
+       "       'weather_dest_delay'],\n",
+       "      dtype='object', length=185)"
+      ]
+     },
+     "metadata": {},
+     "execution_count": 75
+    }
+   ],
+   "source": [
+    "reg_test_PCA.columns"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 77,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "reg_test_PCA = reg_test_PCA.fillna(0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 78,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pca = PCA(n_components=100)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 79,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "components = pca.fit_transform(reg_test_PCA)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 80,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "execute_result",
+     "data": {
+      "text/plain": [
+       "array([4.23258227e+00, 3.73372004e+00, 2.56633242e+00, 2.28904876e+00,\n",
+       "       2.15346610e+00, 2.08232244e+00, 1.91217716e+00, 1.77607508e+00,\n",
+       "       1.69353926e+00, 1.57326227e+00, 1.09581490e+00, 9.98573999e-01,\n",
+       "       9.53329933e-01, 9.12105556e-01, 8.71594519e-01, 7.24159765e-01,\n",
+       "       5.51958946e-01, 4.12951182e-01, 3.09770572e-01, 2.47886462e-01,\n",
+       "       2.27081139e-01, 1.44272377e-01, 1.27915875e-01, 1.23002931e-01,\n",
+       "       9.53825243e-02, 9.13320230e-02, 8.81338168e-02, 8.48159324e-02,\n",
+       "       7.90437449e-02, 7.33077476e-02, 6.69518467e-02, 6.18709110e-02,\n",
+       "       5.56897519e-02, 5.17141130e-02, 4.94763549e-02, 4.70589654e-02,\n",
+       "       4.57290756e-02, 4.34060537e-02, 4.17947349e-02, 3.94068744e-02,\n",
+       "       3.61461715e-02, 3.49938642e-02, 3.37186669e-02, 3.25766264e-02,\n",
+       "       2.90537676e-02, 2.87235470e-02, 2.81260153e-02, 2.66044221e-02,\n",
+       "       2.57605702e-02, 2.51275721e-02, 2.40522441e-02, 2.35389186e-02,\n",
+       "       2.27059378e-02, 2.12446978e-02, 2.02882091e-02, 1.99239869e-02,\n",
+       "       1.82442757e-02, 1.76742534e-02, 1.68896782e-02, 1.62272243e-02,\n",
+       "       1.59933351e-02, 1.52462227e-02, 1.45636980e-02, 1.38382925e-02,\n",
+       "       1.33056320e-02, 1.31803100e-02, 1.27302896e-02, 1.24975922e-02,\n",
+       "       1.16456184e-02, 1.13952525e-02, 1.06722834e-02, 1.03252867e-02,\n",
+       "       1.01497708e-02, 9.80629950e-03, 9.48279234e-03, 9.15641323e-03,\n",
+       "       8.97675475e-03, 8.04706523e-03, 7.95744419e-03, 7.78510162e-03,\n",
+       "       7.43730075e-03, 7.12340163e-03, 6.89470657e-03, 6.60115657e-03,\n",
+       "       6.45755031e-03, 6.27742911e-03, 6.06592662e-03, 5.83905660e-03,\n",
+       "       5.58770723e-03, 5.43773013e-03, 5.40096306e-03, 5.28448561e-03,\n",
+       "       5.00432011e-03, 4.97302332e-03, 4.70086213e-03, 4.55491468e-03,\n",
+       "       4.44422191e-03, 4.33886462e-03, 4.24320142e-03, 3.95109670e-03])"
+      ]
+     },
+     "metadata": {},
+     "execution_count": 80
+    }
+   ],
+   "source": [
+    "pca.explained_variance_"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 81,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "display_data",
+     "data": {
+      "text/plain": "<Figure size 432x288 with 1 Axes>",
+      "image/svg+xml": "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n  \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n<!-- Created with matplotlib (https://matplotlib.org/) -->\n<svg height=\"268.195312pt\" version=\"1.1\" viewBox=\"0 0 372.103125 268.195312\" width=\"372.103125pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n <metadata>\n  <rdf:RDF xmlns:cc=\"http://creativecommons.org/ns#\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n   <cc:Work>\n    <dc:type rdf:resource=\"http://purl.org/dc/dcmitype/StillImage\"/>\n    <dc:date>2020-10-23T04:03:21.429618</dc:date>\n    <dc:format>image/svg+xml</dc:format>\n    <dc:creator>\n     <cc:Agent>\n      <dc:title>Matplotlib v3.3.1, https://matplotlib.org/</dc:title>\n     </cc:Agent>\n    </dc:creator>\n   </cc:Work>\n  </rdf:RDF>\n </metadata>\n <defs>\n  <style type=\"text/css\">*{stroke-linecap:butt;stroke-linejoin:round;}</style>\n </defs>\n <g id=\"figure_1\">\n  <g id=\"patch_1\">\n   <path d=\"M 0 268.195312 \nL 372.103125 268.195312 \nL 372.103125 0 \nL 0 0 \nz\n\" style=\"fill:none;\"/>\n  </g>\n  <g id=\"axes_1\">\n   <g id=\"patch_2\">\n    <path d=\"M 30.103125 244.317187 \nL 364.903125 244.317187 \nL 364.903125 26.877187 \nL 30.103125 26.877187 \nz\n\" style=\"fill:#ffffff;\"/>\n   </g>\n   <g id=\"matplotlib.axis_1\">\n    <g id=\"xtick_1\">\n     <g id=\"line2d_1\">\n      <defs>\n       <path d=\"M 0 0 \nL 0 3.5 \n\" id=\"m718f9bfbfa\" style=\"stroke:#000000;stroke-width:0.8;\"/>\n      </defs>\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"42.246927\" xlink:href=\"#m718f9bfbfa\" y=\"244.317187\"/>\n      </g>\n     </g>\n     <g id=\"text_1\">\n      <!-- 0 -->\n      <g transform=\"translate(39.065677 258.915625)scale(0.1 -0.1)\">\n       <defs>\n        <path d=\"M 31.78125 66.40625 \nQ 24.171875 66.40625 20.328125 58.90625 \nQ 16.5 51.421875 16.5 36.375 \nQ 16.5 21.390625 20.328125 13.890625 \nQ 24.171875 6.390625 31.78125 6.390625 \nQ 39.453125 6.390625 43.28125 13.890625 \nQ 47.125 21.390625 47.125 36.375 \nQ 47.125 51.421875 43.28125 58.90625 \nQ 39.453125 66.40625 31.78125 66.40625 \nz\nM 31.78125 74.21875 \nQ 44.046875 74.21875 50.515625 64.515625 \nQ 56.984375 54.828125 56.984375 36.375 \nQ 56.984375 17.96875 50.515625 8.265625 \nQ 44.046875 -1.421875 31.78125 -1.421875 \nQ 19.53125 -1.421875 13.0625 8.265625 \nQ 6.59375 17.96875 6.59375 36.375 \nQ 6.59375 54.828125 13.0625 64.515625 \nQ 19.53125 74.21875 31.78125 74.21875 \nz\n\" id=\"DejaVuSans-48\"/>\n       </defs>\n       <use xlink:href=\"#DejaVuSans-48\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"xtick_2\">\n     <g id=\"line2d_2\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"103.73453\" xlink:href=\"#m718f9bfbfa\" y=\"244.317187\"/>\n      </g>\n     </g>\n     <g id=\"text_2\">\n      <!-- 20 -->\n      <g transform=\"translate(97.37203 258.915625)scale(0.1 -0.1)\">\n       <defs>\n        <path d=\"M 19.1875 8.296875 \nL 53.609375 8.296875 \nL 53.609375 0 \nL 7.328125 0 \nL 7.328125 8.296875 \nQ 12.9375 14.109375 22.625 23.890625 \nQ 32.328125 33.6875 34.8125 36.53125 \nQ 39.546875 41.84375 41.421875 45.53125 \nQ 43.3125 49.21875 43.3125 52.78125 \nQ 43.3125 58.59375 39.234375 62.25 \nQ 35.15625 65.921875 28.609375 65.921875 \nQ 23.96875 65.921875 18.8125 64.3125 \nQ 13.671875 62.703125 7.8125 59.421875 \nL 7.8125 69.390625 \nQ 13.765625 71.78125 18.9375 73 \nQ 24.125 74.21875 28.421875 74.21875 \nQ 39.75 74.21875 46.484375 68.546875 \nQ 53.21875 62.890625 53.21875 53.421875 \nQ 53.21875 48.921875 51.53125 44.890625 \nQ 49.859375 40.875 45.40625 35.40625 \nQ 44.1875 33.984375 37.640625 27.21875 \nQ 31.109375 20.453125 19.1875 8.296875 \nz\n\" id=\"DejaVuSans-50\"/>\n       </defs>\n       <use xlink:href=\"#DejaVuSans-50\"/>\n       <use x=\"63.623047\" xlink:href=\"#DejaVuSans-48\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"xtick_3\">\n     <g id=\"line2d_3\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"165.222133\" xlink:href=\"#m718f9bfbfa\" y=\"244.317187\"/>\n      </g>\n     </g>\n     <g id=\"text_3\">\n      <!-- 40 -->\n      <g transform=\"translate(158.859633 258.915625)scale(0.1 -0.1)\">\n       <defs>\n        <path d=\"M 37.796875 64.3125 \nL 12.890625 25.390625 \nL 37.796875 25.390625 \nz\nM 35.203125 72.90625 \nL 47.609375 72.90625 \nL 47.609375 25.390625 \nL 58.015625 25.390625 \nL 58.015625 17.1875 \nL 47.609375 17.1875 \nL 47.609375 0 \nL 37.796875 0 \nL 37.796875 17.1875 \nL 4.890625 17.1875 \nL 4.890625 26.703125 \nz\n\" id=\"DejaVuSans-52\"/>\n       </defs>\n       <use xlink:href=\"#DejaVuSans-52\"/>\n       <use x=\"63.623047\" xlink:href=\"#DejaVuSans-48\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"xtick_4\">\n     <g id=\"line2d_4\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"226.709737\" xlink:href=\"#m718f9bfbfa\" y=\"244.317187\"/>\n      </g>\n     </g>\n     <g id=\"text_4\">\n      <!-- 60 -->\n      <g transform=\"translate(220.347237 258.915625)scale(0.1 -0.1)\">\n       <defs>\n        <path d=\"M 33.015625 40.375 \nQ 26.375 40.375 22.484375 35.828125 \nQ 18.609375 31.296875 18.609375 23.390625 \nQ 18.609375 15.53125 22.484375 10.953125 \nQ 26.375 6.390625 33.015625 6.390625 \nQ 39.65625 6.390625 43.53125 10.953125 \nQ 47.40625 15.53125 47.40625 23.390625 \nQ 47.40625 31.296875 43.53125 35.828125 \nQ 39.65625 40.375 33.015625 40.375 \nz\nM 52.59375 71.296875 \nL 52.59375 62.3125 \nQ 48.875 64.0625 45.09375 64.984375 \nQ 41.3125 65.921875 37.59375 65.921875 \nQ 27.828125 65.921875 22.671875 59.328125 \nQ 17.53125 52.734375 16.796875 39.40625 \nQ 19.671875 43.65625 24.015625 45.921875 \nQ 28.375 48.1875 33.59375 48.1875 \nQ 44.578125 48.1875 50.953125 41.515625 \nQ 57.328125 34.859375 57.328125 23.390625 \nQ 57.328125 12.15625 50.6875 5.359375 \nQ 44.046875 -1.421875 33.015625 -1.421875 \nQ 20.359375 -1.421875 13.671875 8.265625 \nQ 6.984375 17.96875 6.984375 36.375 \nQ 6.984375 53.65625 15.1875 63.9375 \nQ 23.390625 74.21875 37.203125 74.21875 \nQ 40.921875 74.21875 44.703125 73.484375 \nQ 48.484375 72.75 52.59375 71.296875 \nz\n\" id=\"DejaVuSans-54\"/>\n       </defs>\n       <use xlink:href=\"#DejaVuSans-54\"/>\n       <use x=\"63.623047\" xlink:href=\"#DejaVuSans-48\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"xtick_5\">\n     <g id=\"line2d_5\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"288.19734\" xlink:href=\"#m718f9bfbfa\" y=\"244.317187\"/>\n      </g>\n     </g>\n     <g id=\"text_5\">\n      <!-- 80 -->\n      <g transform=\"translate(281.83484 258.915625)scale(0.1 -0.1)\">\n       <defs>\n        <path d=\"M 31.78125 34.625 \nQ 24.75 34.625 20.71875 30.859375 \nQ 16.703125 27.09375 16.703125 20.515625 \nQ 16.703125 13.921875 20.71875 10.15625 \nQ 24.75 6.390625 31.78125 6.390625 \nQ 38.8125 6.390625 42.859375 10.171875 \nQ 46.921875 13.96875 46.921875 20.515625 \nQ 46.921875 27.09375 42.890625 30.859375 \nQ 38.875 34.625 31.78125 34.625 \nz\nM 21.921875 38.8125 \nQ 15.578125 40.375 12.03125 44.71875 \nQ 8.5 49.078125 8.5 55.328125 \nQ 8.5 64.0625 14.71875 69.140625 \nQ 20.953125 74.21875 31.78125 74.21875 \nQ 42.671875 74.21875 48.875 69.140625 \nQ 55.078125 64.0625 55.078125 55.328125 \nQ 55.078125 49.078125 51.53125 44.71875 \nQ 48 40.375 41.703125 38.8125 \nQ 48.828125 37.15625 52.796875 32.3125 \nQ 56.78125 27.484375 56.78125 20.515625 \nQ 56.78125 9.90625 50.3125 4.234375 \nQ 43.84375 -1.421875 31.78125 -1.421875 \nQ 19.734375 -1.421875 13.25 4.234375 \nQ 6.78125 9.90625 6.78125 20.515625 \nQ 6.78125 27.484375 10.78125 32.3125 \nQ 14.796875 37.15625 21.921875 38.8125 \nz\nM 18.3125 54.390625 \nQ 18.3125 48.734375 21.84375 45.5625 \nQ 25.390625 42.390625 31.78125 42.390625 \nQ 38.140625 42.390625 41.71875 45.5625 \nQ 45.3125 48.734375 45.3125 54.390625 \nQ 45.3125 60.0625 41.71875 63.234375 \nQ 38.140625 66.40625 31.78125 66.40625 \nQ 25.390625 66.40625 21.84375 63.234375 \nQ 18.3125 60.0625 18.3125 54.390625 \nz\n\" id=\"DejaVuSans-56\"/>\n       </defs>\n       <use xlink:href=\"#DejaVuSans-56\"/>\n       <use x=\"63.623047\" xlink:href=\"#DejaVuSans-48\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"xtick_6\">\n     <g id=\"line2d_6\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"349.684943\" xlink:href=\"#m718f9bfbfa\" y=\"244.317187\"/>\n      </g>\n     </g>\n     <g id=\"text_6\">\n      <!-- 100 -->\n      <g transform=\"translate(340.141193 258.915625)scale(0.1 -0.1)\">\n       <defs>\n        <path d=\"M 12.40625 8.296875 \nL 28.515625 8.296875 \nL 28.515625 63.921875 \nL 10.984375 60.40625 \nL 10.984375 69.390625 \nL 28.421875 72.90625 \nL 38.28125 72.90625 \nL 38.28125 8.296875 \nL 54.390625 8.296875 \nL 54.390625 0 \nL 12.40625 0 \nz\n\" id=\"DejaVuSans-49\"/>\n       </defs>\n       <use xlink:href=\"#DejaVuSans-49\"/>\n       <use x=\"63.623047\" xlink:href=\"#DejaVuSans-48\"/>\n       <use x=\"127.246094\" xlink:href=\"#DejaVuSans-48\"/>\n      </g>\n     </g>\n    </g>\n   </g>\n   <g id=\"matplotlib.axis_2\">\n    <g id=\"ytick_1\">\n     <g id=\"line2d_7\">\n      <defs>\n       <path d=\"M 0 0 \nL -3.5 0 \n\" id=\"ma89bf0ab15\" style=\"stroke:#000000;stroke-width:0.8;\"/>\n      </defs>\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"30.103125\" xlink:href=\"#ma89bf0ab15\" y=\"217.521798\"/>\n      </g>\n     </g>\n     <g id=\"text_7\">\n      <!-- 0.2 -->\n      <g transform=\"translate(7.2 221.321017)scale(0.1 -0.1)\">\n       <defs>\n        <path d=\"M 10.6875 12.40625 \nL 21 12.40625 \nL 21 0 \nL 10.6875 0 \nz\n\" id=\"DejaVuSans-46\"/>\n       </defs>\n       <use xlink:href=\"#DejaVuSans-48\"/>\n       <use x=\"63.623047\" xlink:href=\"#DejaVuSans-46\"/>\n       <use x=\"95.410156\" xlink:href=\"#DejaVuSans-50\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"ytick_2\">\n     <g id=\"line2d_8\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"30.103125\" xlink:href=\"#ma89bf0ab15\" y=\"172.088444\"/>\n      </g>\n     </g>\n     <g id=\"text_8\">\n      <!-- 0.4 -->\n      <g transform=\"translate(7.2 175.887663)scale(0.1 -0.1)\">\n       <use xlink:href=\"#DejaVuSans-48\"/>\n       <use x=\"63.623047\" xlink:href=\"#DejaVuSans-46\"/>\n       <use x=\"95.410156\" xlink:href=\"#DejaVuSans-52\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"ytick_3\">\n     <g id=\"line2d_9\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"30.103125\" xlink:href=\"#ma89bf0ab15\" y=\"126.655089\"/>\n      </g>\n     </g>\n     <g id=\"text_9\">\n      <!-- 0.6 -->\n      <g transform=\"translate(7.2 130.454308)scale(0.1 -0.1)\">\n       <use xlink:href=\"#DejaVuSans-48\"/>\n       <use x=\"63.623047\" xlink:href=\"#DejaVuSans-46\"/>\n       <use x=\"95.410156\" xlink:href=\"#DejaVuSans-54\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"ytick_4\">\n     <g id=\"line2d_10\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"30.103125\" xlink:href=\"#ma89bf0ab15\" y=\"81.221735\"/>\n      </g>\n     </g>\n     <g id=\"text_10\">\n      <!-- 0.8 -->\n      <g transform=\"translate(7.2 85.020953)scale(0.1 -0.1)\">\n       <use xlink:href=\"#DejaVuSans-48\"/>\n       <use x=\"63.623047\" xlink:href=\"#DejaVuSans-46\"/>\n       <use x=\"95.410156\" xlink:href=\"#DejaVuSans-56\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"ytick_5\">\n     <g id=\"line2d_11\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"30.103125\" xlink:href=\"#ma89bf0ab15\" y=\"35.78838\"/>\n      </g>\n     </g>\n     <g id=\"text_11\">\n      <!-- 1.0 -->\n      <g transform=\"translate(7.2 39.587599)scale(0.1 -0.1)\">\n       <use xlink:href=\"#DejaVuSans-49\"/>\n       <use x=\"63.623047\" xlink:href=\"#DejaVuSans-46\"/>\n       <use x=\"95.410156\" xlink:href=\"#DejaVuSans-48\"/>\n      </g>\n     </g>\n    </g>\n   </g>\n   <g id=\"line2d_12\">\n    <path clip-path=\"url(#p8bf89ab15f)\" d=\"M 45.321307 234.433551 \nL 48.395687 209.273573 \nL 51.470067 191.980132 \nL 54.544447 176.55519 \nL 57.618827 162.043882 \nL 60.693208 148.011982 \nL 63.767588 135.12662 \nL 66.841968 123.158393 \nL 69.916348 111.74634 \nL 72.990728 101.144783 \nL 76.065108 93.760545 \nL 79.139489 87.031572 \nL 82.213869 80.607481 \nL 85.288249 74.461183 \nL 88.362629 68.587872 \nL 91.437009 63.708062 \nL 94.511389 59.988641 \nL 97.58577 57.205936 \nL 100.66015 55.118522 \nL 103.73453 53.448119 \nL 106.80891 51.917914 \nL 109.88329 50.945723 \nL 112.95767 50.083751 \nL 116.032051 49.254886 \nL 119.106431 48.612143 \nL 122.180811 47.996694 \nL 125.255191 47.402797 \nL 128.329571 46.831258 \nL 131.403951 46.298616 \nL 134.478332 45.804625 \nL 137.552712 45.353465 \nL 140.627092 44.936543 \nL 143.701472 44.561273 \nL 146.775852 44.212793 \nL 149.850232 43.879392 \nL 152.924613 43.562282 \nL 155.998993 43.254133 \nL 159.073373 42.961637 \nL 162.147753 42.68 \nL 165.222133 42.414454 \nL 168.296513 42.17088 \nL 171.370894 41.935071 \nL 174.445274 41.707855 \nL 177.519654 41.488335 \nL 180.594034 41.292553 \nL 183.668414 41.098997 \nL 186.742794 40.909468 \nL 189.817175 40.730192 \nL 192.891555 40.556602 \nL 195.965935 40.387278 \nL 199.040315 40.2252 \nL 202.114695 40.066581 \nL 205.189075 39.913575 \nL 208.263456 39.770416 \nL 211.337836 39.633702 \nL 214.412216 39.499443 \nL 217.486596 39.376502 \nL 220.560976 39.257403 \nL 223.635356 39.14359 \nL 226.709737 39.034242 \nL 229.784117 38.92647 \nL 232.858497 38.823732 \nL 235.932877 38.725593 \nL 239.007257 38.632342 \nL 242.081637 38.542681 \nL 245.156018 38.453865 \nL 248.230398 38.368081 \nL 251.304778 38.283865 \nL 254.379158 38.20539 \nL 257.453538 38.128602 \nL 260.527918 38.056686 \nL 263.602299 37.987108 \nL 266.676679 37.918713 \nL 269.751059 37.852632 \nL 272.825439 37.788732 \nL 275.899819 37.727031 \nL 278.974199 37.66654 \nL 282.04858 37.612314 \nL 285.12296 37.558692 \nL 288.19734 37.506232 \nL 291.27172 37.456115 \nL 294.3461 37.408113 \nL 297.42048 37.361653 \nL 300.494861 37.31717 \nL 303.569241 37.273656 \nL 306.643621 37.231355 \nL 309.718001 37.190479 \nL 312.792381 37.151132 \nL 315.866761 37.113479 \nL 318.941142 37.076836 \nL 322.015522 37.040441 \nL 325.089902 37.004831 \nL 328.164282 36.971109 \nL 331.238662 36.937598 \nL 334.313042 36.905921 \nL 337.387423 36.875227 \nL 340.461803 36.84528 \nL 343.536183 36.816042 \nL 346.610563 36.787449 \nL 349.684943 36.760824 \n\" style=\"fill:none;stroke:#1f77b4;stroke-linecap:square;stroke-width:1.5;\"/>\n    <defs>\n     <path d=\"M 0 3 \nC 0.795609 3 1.55874 2.683901 2.12132 2.12132 \nC 2.683901 1.55874 3 0.795609 3 0 \nC 3 -0.795609 2.683901 -1.55874 2.12132 -2.12132 \nC 1.55874 -2.683901 0.795609 -3 0 -3 \nC -0.795609 -3 -1.55874 -2.683901 -2.12132 -2.12132 \nC -2.683901 -1.55874 -3 -0.795609 -3 0 \nC -3 0.795609 -2.683901 1.55874 -2.12132 2.12132 \nC -1.55874 2.683901 -0.795609 3 0 3 \nz\n\" id=\"m4e6306fec7\" style=\"stroke:#1f77b4;\"/>\n    </defs>\n    <g clip-path=\"url(#p8bf89ab15f)\">\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"45.321307\" xlink:href=\"#m4e6306fec7\" y=\"234.433551\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"48.395687\" xlink:href=\"#m4e6306fec7\" y=\"209.273573\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"51.470067\" xlink:href=\"#m4e6306fec7\" y=\"191.980132\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"54.544447\" xlink:href=\"#m4e6306fec7\" y=\"176.55519\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"57.618827\" xlink:href=\"#m4e6306fec7\" y=\"162.043882\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"60.693208\" xlink:href=\"#m4e6306fec7\" y=\"148.011982\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"63.767588\" xlink:href=\"#m4e6306fec7\" y=\"135.12662\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"66.841968\" xlink:href=\"#m4e6306fec7\" y=\"123.158393\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"69.916348\" xlink:href=\"#m4e6306fec7\" y=\"111.74634\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"72.990728\" xlink:href=\"#m4e6306fec7\" y=\"101.144783\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"76.065108\" xlink:href=\"#m4e6306fec7\" y=\"93.760545\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"79.139489\" xlink:href=\"#m4e6306fec7\" y=\"87.031572\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"82.213869\" xlink:href=\"#m4e6306fec7\" y=\"80.607481\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"85.288249\" xlink:href=\"#m4e6306fec7\" y=\"74.461183\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"88.362629\" xlink:href=\"#m4e6306fec7\" y=\"68.587872\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"91.437009\" xlink:href=\"#m4e6306fec7\" y=\"63.708062\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"94.511389\" xlink:href=\"#m4e6306fec7\" y=\"59.988641\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"97.58577\" xlink:href=\"#m4e6306fec7\" y=\"57.205936\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"100.66015\" xlink:href=\"#m4e6306fec7\" y=\"55.118522\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"103.73453\" xlink:href=\"#m4e6306fec7\" y=\"53.448119\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"106.80891\" xlink:href=\"#m4e6306fec7\" y=\"51.917914\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"109.88329\" xlink:href=\"#m4e6306fec7\" y=\"50.945723\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"112.95767\" xlink:href=\"#m4e6306fec7\" y=\"50.083751\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"116.032051\" xlink:href=\"#m4e6306fec7\" y=\"49.254886\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"119.106431\" xlink:href=\"#m4e6306fec7\" y=\"48.612143\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"122.180811\" xlink:href=\"#m4e6306fec7\" y=\"47.996694\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"125.255191\" xlink:href=\"#m4e6306fec7\" y=\"47.402797\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"128.329571\" xlink:href=\"#m4e6306fec7\" y=\"46.831258\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"131.403951\" xlink:href=\"#m4e6306fec7\" y=\"46.298616\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"134.478332\" xlink:href=\"#m4e6306fec7\" y=\"45.804625\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"137.552712\" xlink:href=\"#m4e6306fec7\" y=\"45.353465\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"140.627092\" xlink:href=\"#m4e6306fec7\" y=\"44.936543\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"143.701472\" xlink:href=\"#m4e6306fec7\" y=\"44.561273\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"146.775852\" xlink:href=\"#m4e6306fec7\" y=\"44.212793\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"149.850232\" xlink:href=\"#m4e6306fec7\" y=\"43.879392\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"152.924613\" xlink:href=\"#m4e6306fec7\" y=\"43.562282\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"155.998993\" xlink:href=\"#m4e6306fec7\" y=\"43.254133\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"159.073373\" xlink:href=\"#m4e6306fec7\" y=\"42.961637\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"162.147753\" xlink:href=\"#m4e6306fec7\" y=\"42.68\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"165.222133\" xlink:href=\"#m4e6306fec7\" y=\"42.414454\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"168.296513\" xlink:href=\"#m4e6306fec7\" y=\"42.17088\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"171.370894\" xlink:href=\"#m4e6306fec7\" y=\"41.935071\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"174.445274\" xlink:href=\"#m4e6306fec7\" y=\"41.707855\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"177.519654\" xlink:href=\"#m4e6306fec7\" y=\"41.488335\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"180.594034\" xlink:href=\"#m4e6306fec7\" y=\"41.292553\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"183.668414\" xlink:href=\"#m4e6306fec7\" y=\"41.098997\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"186.742794\" xlink:href=\"#m4e6306fec7\" y=\"40.909468\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"189.817175\" xlink:href=\"#m4e6306fec7\" y=\"40.730192\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"192.891555\" xlink:href=\"#m4e6306fec7\" y=\"40.556602\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"195.965935\" xlink:href=\"#m4e6306fec7\" y=\"40.387278\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"199.040315\" xlink:href=\"#m4e6306fec7\" y=\"40.2252\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"202.114695\" xlink:href=\"#m4e6306fec7\" y=\"40.066581\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"205.189075\" xlink:href=\"#m4e6306fec7\" y=\"39.913575\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"208.263456\" xlink:href=\"#m4e6306fec7\" y=\"39.770416\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"211.337836\" xlink:href=\"#m4e6306fec7\" y=\"39.633702\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"214.412216\" xlink:href=\"#m4e6306fec7\" y=\"39.499443\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"217.486596\" xlink:href=\"#m4e6306fec7\" y=\"39.376502\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"220.560976\" xlink:href=\"#m4e6306fec7\" y=\"39.257403\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"223.635356\" xlink:href=\"#m4e6306fec7\" y=\"39.14359\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"226.709737\" xlink:href=\"#m4e6306fec7\" y=\"39.034242\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"229.784117\" xlink:href=\"#m4e6306fec7\" y=\"38.92647\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"232.858497\" xlink:href=\"#m4e6306fec7\" y=\"38.823732\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"235.932877\" xlink:href=\"#m4e6306fec7\" y=\"38.725593\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"239.007257\" xlink:href=\"#m4e6306fec7\" y=\"38.632342\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"242.081637\" xlink:href=\"#m4e6306fec7\" y=\"38.542681\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"245.156018\" xlink:href=\"#m4e6306fec7\" y=\"38.453865\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"248.230398\" xlink:href=\"#m4e6306fec7\" y=\"38.368081\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"251.304778\" xlink:href=\"#m4e6306fec7\" y=\"38.283865\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"254.379158\" xlink:href=\"#m4e6306fec7\" y=\"38.20539\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"257.453538\" xlink:href=\"#m4e6306fec7\" y=\"38.128602\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"260.527918\" xlink:href=\"#m4e6306fec7\" y=\"38.056686\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"263.602299\" xlink:href=\"#m4e6306fec7\" y=\"37.987108\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"266.676679\" xlink:href=\"#m4e6306fec7\" y=\"37.918713\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"269.751059\" xlink:href=\"#m4e6306fec7\" y=\"37.852632\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"272.825439\" xlink:href=\"#m4e6306fec7\" y=\"37.788732\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"275.899819\" xlink:href=\"#m4e6306fec7\" y=\"37.727031\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"278.974199\" xlink:href=\"#m4e6306fec7\" y=\"37.66654\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"282.04858\" xlink:href=\"#m4e6306fec7\" y=\"37.612314\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"285.12296\" xlink:href=\"#m4e6306fec7\" y=\"37.558692\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"288.19734\" xlink:href=\"#m4e6306fec7\" y=\"37.506232\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"291.27172\" xlink:href=\"#m4e6306fec7\" y=\"37.456115\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"294.3461\" xlink:href=\"#m4e6306fec7\" y=\"37.408113\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"297.42048\" xlink:href=\"#m4e6306fec7\" y=\"37.361653\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"300.494861\" xlink:href=\"#m4e6306fec7\" y=\"37.31717\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"303.569241\" xlink:href=\"#m4e6306fec7\" y=\"37.273656\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"306.643621\" xlink:href=\"#m4e6306fec7\" y=\"37.231355\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"309.718001\" xlink:href=\"#m4e6306fec7\" y=\"37.190479\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"312.792381\" xlink:href=\"#m4e6306fec7\" y=\"37.151132\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"315.866761\" xlink:href=\"#m4e6306fec7\" y=\"37.113479\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"318.941142\" xlink:href=\"#m4e6306fec7\" y=\"37.076836\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"322.015522\" xlink:href=\"#m4e6306fec7\" y=\"37.040441\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"325.089902\" xlink:href=\"#m4e6306fec7\" y=\"37.004831\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"328.164282\" xlink:href=\"#m4e6306fec7\" y=\"36.971109\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"331.238662\" xlink:href=\"#m4e6306fec7\" y=\"36.937598\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"334.313042\" xlink:href=\"#m4e6306fec7\" y=\"36.905921\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"337.387423\" xlink:href=\"#m4e6306fec7\" y=\"36.875227\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"340.461803\" xlink:href=\"#m4e6306fec7\" y=\"36.84528\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"343.536183\" xlink:href=\"#m4e6306fec7\" y=\"36.816042\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"346.610563\" xlink:href=\"#m4e6306fec7\" y=\"36.787449\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"349.684943\" xlink:href=\"#m4e6306fec7\" y=\"36.760824\"/>\n    </g>\n   </g>\n   <g id=\"line2d_13\">\n    <path clip-path=\"url(#p8bf89ab15f)\" d=\"M 30.103125 47.146719 \nL 364.903125 47.146719 \n\" style=\"fill:none;stroke:#ff0000;stroke-linecap:square;stroke-width:1.5;\"/>\n   </g>\n   <g id=\"line2d_14\">\n    <path clip-path=\"url(#p8bf89ab15f)\" d=\"M 349.684943 244.317187 \nL 349.684943 26.877187 \n\" style=\"fill:none;stroke:#ff0000;stroke-linecap:square;stroke-width:1.5;\"/>\n   </g>\n   <g id=\"patch_3\">\n    <path d=\"M 30.103125 244.317187 \nL 30.103125 26.877188 \n\" style=\"fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;\"/>\n   </g>\n   <g id=\"patch_4\">\n    <path d=\"M 364.903125 244.317187 \nL 364.903125 26.877188 \n\" style=\"fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;\"/>\n   </g>\n   <g id=\"patch_5\">\n    <path d=\"M 30.103125 244.317187 \nL 364.903125 244.317187 \n\" style=\"fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;\"/>\n   </g>\n   <g id=\"patch_6\">\n    <path d=\"M 30.103125 26.877187 \nL 364.903125 26.877187 \n\" style=\"fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;\"/>\n   </g>\n   <g id=\"text_12\">\n    <!-- Variance explained - Customer -->\n    <g transform=\"translate(59.187188 20.877187)scale(0.18 -0.18)\">\n     <defs>\n      <path d=\"M 28.609375 0 \nL 0.78125 72.90625 \nL 11.078125 72.90625 \nL 34.1875 11.53125 \nL 57.328125 72.90625 \nL 67.578125 72.90625 \nL 39.796875 0 \nz\n\" id=\"DejaVuSans-86\"/>\n      <path d=\"M 34.28125 27.484375 \nQ 23.390625 27.484375 19.1875 25 \nQ 14.984375 22.515625 14.984375 16.5 \nQ 14.984375 11.71875 18.140625 8.90625 \nQ 21.296875 6.109375 26.703125 6.109375 \nQ 34.1875 6.109375 38.703125 11.40625 \nQ 43.21875 16.703125 43.21875 25.484375 \nL 43.21875 27.484375 \nz\nM 52.203125 31.203125 \nL 52.203125 0 \nL 43.21875 0 \nL 43.21875 8.296875 \nQ 40.140625 3.328125 35.546875 0.953125 \nQ 30.953125 -1.421875 24.3125 -1.421875 \nQ 15.921875 -1.421875 10.953125 3.296875 \nQ 6 8.015625 6 15.921875 \nQ 6 25.140625 12.171875 29.828125 \nQ 18.359375 34.515625 30.609375 34.515625 \nL 43.21875 34.515625 \nL 43.21875 35.40625 \nQ 43.21875 41.609375 39.140625 45 \nQ 35.0625 48.390625 27.6875 48.390625 \nQ 23 48.390625 18.546875 47.265625 \nQ 14.109375 46.140625 10.015625 43.890625 \nL 10.015625 52.203125 \nQ 14.9375 54.109375 19.578125 55.046875 \nQ 24.21875 56 28.609375 56 \nQ 40.484375 56 46.34375 49.84375 \nQ 52.203125 43.703125 52.203125 31.203125 \nz\n\" id=\"DejaVuSans-97\"/>\n      <path d=\"M 41.109375 46.296875 \nQ 39.59375 47.171875 37.8125 47.578125 \nQ 36.03125 48 33.890625 48 \nQ 26.265625 48 22.1875 43.046875 \nQ 18.109375 38.09375 18.109375 28.8125 \nL 18.109375 0 \nL 9.078125 0 \nL 9.078125 54.6875 \nL 18.109375 54.6875 \nL 18.109375 46.1875 \nQ 20.953125 51.171875 25.484375 53.578125 \nQ 30.03125 56 36.53125 56 \nQ 37.453125 56 38.578125 55.875 \nQ 39.703125 55.765625 41.0625 55.515625 \nz\n\" id=\"DejaVuSans-114\"/>\n      <path d=\"M 9.421875 54.6875 \nL 18.40625 54.6875 \nL 18.40625 0 \nL 9.421875 0 \nz\nM 9.421875 75.984375 \nL 18.40625 75.984375 \nL 18.40625 64.59375 \nL 9.421875 64.59375 \nz\n\" id=\"DejaVuSans-105\"/>\n      <path d=\"M 54.890625 33.015625 \nL 54.890625 0 \nL 45.90625 0 \nL 45.90625 32.71875 \nQ 45.90625 40.484375 42.875 44.328125 \nQ 39.84375 48.1875 33.796875 48.1875 \nQ 26.515625 48.1875 22.3125 43.546875 \nQ 18.109375 38.921875 18.109375 30.90625 \nL 18.109375 0 \nL 9.078125 0 \nL 9.078125 54.6875 \nL 18.109375 54.6875 \nL 18.109375 46.1875 \nQ 21.34375 51.125 25.703125 53.5625 \nQ 30.078125 56 35.796875 56 \nQ 45.21875 56 50.046875 50.171875 \nQ 54.890625 44.34375 54.890625 33.015625 \nz\n\" id=\"DejaVuSans-110\"/>\n      <path d=\"M 48.78125 52.59375 \nL 48.78125 44.1875 \nQ 44.96875 46.296875 41.140625 47.34375 \nQ 37.3125 48.390625 33.40625 48.390625 \nQ 24.65625 48.390625 19.8125 42.84375 \nQ 14.984375 37.3125 14.984375 27.296875 \nQ 14.984375 17.28125 19.8125 11.734375 \nQ 24.65625 6.203125 33.40625 6.203125 \nQ 37.3125 6.203125 41.140625 7.25 \nQ 44.96875 8.296875 48.78125 10.40625 \nL 48.78125 2.09375 \nQ 45.015625 0.34375 40.984375 -0.53125 \nQ 36.96875 -1.421875 32.421875 -1.421875 \nQ 20.0625 -1.421875 12.78125 6.34375 \nQ 5.515625 14.109375 5.515625 27.296875 \nQ 5.515625 40.671875 12.859375 48.328125 \nQ 20.21875 56 33.015625 56 \nQ 37.15625 56 41.109375 55.140625 \nQ 45.0625 54.296875 48.78125 52.59375 \nz\n\" id=\"DejaVuSans-99\"/>\n      <path d=\"M 56.203125 29.59375 \nL 56.203125 25.203125 \nL 14.890625 25.203125 \nQ 15.484375 15.921875 20.484375 11.0625 \nQ 25.484375 6.203125 34.421875 6.203125 \nQ 39.59375 6.203125 44.453125 7.46875 \nQ 49.3125 8.734375 54.109375 11.28125 \nL 54.109375 2.78125 \nQ 49.265625 0.734375 44.1875 -0.34375 \nQ 39.109375 -1.421875 33.890625 -1.421875 \nQ 20.796875 -1.421875 13.15625 6.1875 \nQ 5.515625 13.8125 5.515625 26.8125 \nQ 5.515625 40.234375 12.765625 48.109375 \nQ 20.015625 56 32.328125 56 \nQ 43.359375 56 49.78125 48.890625 \nQ 56.203125 41.796875 56.203125 29.59375 \nz\nM 47.21875 32.234375 \nQ 47.125 39.59375 43.09375 43.984375 \nQ 39.0625 48.390625 32.421875 48.390625 \nQ 24.90625 48.390625 20.390625 44.140625 \nQ 15.875 39.890625 15.1875 32.171875 \nz\n\" id=\"DejaVuSans-101\"/>\n      <path id=\"DejaVuSans-32\"/>\n      <path d=\"M 54.890625 54.6875 \nL 35.109375 28.078125 \nL 55.90625 0 \nL 45.3125 0 \nL 29.390625 21.484375 \nL 13.484375 0 \nL 2.875 0 \nL 24.125 28.609375 \nL 4.6875 54.6875 \nL 15.28125 54.6875 \nL 29.78125 35.203125 \nL 44.28125 54.6875 \nz\n\" id=\"DejaVuSans-120\"/>\n      <path d=\"M 18.109375 8.203125 \nL 18.109375 -20.796875 \nL 9.078125 -20.796875 \nL 9.078125 54.6875 \nL 18.109375 54.6875 \nL 18.109375 46.390625 \nQ 20.953125 51.265625 25.265625 53.625 \nQ 29.59375 56 35.59375 56 \nQ 45.5625 56 51.78125 48.09375 \nQ 58.015625 40.1875 58.015625 27.296875 \nQ 58.015625 14.40625 51.78125 6.484375 \nQ 45.5625 -1.421875 35.59375 -1.421875 \nQ 29.59375 -1.421875 25.265625 0.953125 \nQ 20.953125 3.328125 18.109375 8.203125 \nz\nM 48.6875 27.296875 \nQ 48.6875 37.203125 44.609375 42.84375 \nQ 40.53125 48.484375 33.40625 48.484375 \nQ 26.265625 48.484375 22.1875 42.84375 \nQ 18.109375 37.203125 18.109375 27.296875 \nQ 18.109375 17.390625 22.1875 11.75 \nQ 26.265625 6.109375 33.40625 6.109375 \nQ 40.53125 6.109375 44.609375 11.75 \nQ 48.6875 17.390625 48.6875 27.296875 \nz\n\" id=\"DejaVuSans-112\"/>\n      <path d=\"M 9.421875 75.984375 \nL 18.40625 75.984375 \nL 18.40625 0 \nL 9.421875 0 \nz\n\" id=\"DejaVuSans-108\"/>\n      <path d=\"M 45.40625 46.390625 \nL 45.40625 75.984375 \nL 54.390625 75.984375 \nL 54.390625 0 \nL 45.40625 0 \nL 45.40625 8.203125 \nQ 42.578125 3.328125 38.25 0.953125 \nQ 33.9375 -1.421875 27.875 -1.421875 \nQ 17.96875 -1.421875 11.734375 6.484375 \nQ 5.515625 14.40625 5.515625 27.296875 \nQ 5.515625 40.1875 11.734375 48.09375 \nQ 17.96875 56 27.875 56 \nQ 33.9375 56 38.25 53.625 \nQ 42.578125 51.265625 45.40625 46.390625 \nz\nM 14.796875 27.296875 \nQ 14.796875 17.390625 18.875 11.75 \nQ 22.953125 6.109375 30.078125 6.109375 \nQ 37.203125 6.109375 41.296875 11.75 \nQ 45.40625 17.390625 45.40625 27.296875 \nQ 45.40625 37.203125 41.296875 42.84375 \nQ 37.203125 48.484375 30.078125 48.484375 \nQ 22.953125 48.484375 18.875 42.84375 \nQ 14.796875 37.203125 14.796875 27.296875 \nz\n\" id=\"DejaVuSans-100\"/>\n      <path d=\"M 4.890625 31.390625 \nL 31.203125 31.390625 \nL 31.203125 23.390625 \nL 4.890625 23.390625 \nz\n\" id=\"DejaVuSans-45\"/>\n      <path d=\"M 64.40625 67.28125 \nL 64.40625 56.890625 \nQ 59.421875 61.53125 53.78125 63.8125 \nQ 48.140625 66.109375 41.796875 66.109375 \nQ 29.296875 66.109375 22.65625 58.46875 \nQ 16.015625 50.828125 16.015625 36.375 \nQ 16.015625 21.96875 22.65625 14.328125 \nQ 29.296875 6.6875 41.796875 6.6875 \nQ 48.140625 6.6875 53.78125 8.984375 \nQ 59.421875 11.28125 64.40625 15.921875 \nL 64.40625 5.609375 \nQ 59.234375 2.09375 53.4375 0.328125 \nQ 47.65625 -1.421875 41.21875 -1.421875 \nQ 24.65625 -1.421875 15.125 8.703125 \nQ 5.609375 18.84375 5.609375 36.375 \nQ 5.609375 53.953125 15.125 64.078125 \nQ 24.65625 74.21875 41.21875 74.21875 \nQ 47.75 74.21875 53.53125 72.484375 \nQ 59.328125 70.75 64.40625 67.28125 \nz\n\" id=\"DejaVuSans-67\"/>\n      <path d=\"M 8.5 21.578125 \nL 8.5 54.6875 \nL 17.484375 54.6875 \nL 17.484375 21.921875 \nQ 17.484375 14.15625 20.5 10.265625 \nQ 23.53125 6.390625 29.59375 6.390625 \nQ 36.859375 6.390625 41.078125 11.03125 \nQ 45.3125 15.671875 45.3125 23.6875 \nL 45.3125 54.6875 \nL 54.296875 54.6875 \nL 54.296875 0 \nL 45.3125 0 \nL 45.3125 8.40625 \nQ 42.046875 3.421875 37.71875 1 \nQ 33.40625 -1.421875 27.6875 -1.421875 \nQ 18.265625 -1.421875 13.375 4.4375 \nQ 8.5 10.296875 8.5 21.578125 \nz\nM 31.109375 56 \nz\n\" id=\"DejaVuSans-117\"/>\n      <path d=\"M 44.28125 53.078125 \nL 44.28125 44.578125 \nQ 40.484375 46.53125 36.375 47.5 \nQ 32.28125 48.484375 27.875 48.484375 \nQ 21.1875 48.484375 17.84375 46.4375 \nQ 14.5 44.390625 14.5 40.28125 \nQ 14.5 37.15625 16.890625 35.375 \nQ 19.28125 33.59375 26.515625 31.984375 \nL 29.59375 31.296875 \nQ 39.15625 29.25 43.1875 25.515625 \nQ 47.21875 21.78125 47.21875 15.09375 \nQ 47.21875 7.46875 41.1875 3.015625 \nQ 35.15625 -1.421875 24.609375 -1.421875 \nQ 20.21875 -1.421875 15.453125 -0.5625 \nQ 10.6875 0.296875 5.421875 2 \nL 5.421875 11.28125 \nQ 10.40625 8.6875 15.234375 7.390625 \nQ 20.0625 6.109375 24.8125 6.109375 \nQ 31.15625 6.109375 34.5625 8.28125 \nQ 37.984375 10.453125 37.984375 14.40625 \nQ 37.984375 18.0625 35.515625 20.015625 \nQ 33.0625 21.96875 24.703125 23.78125 \nL 21.578125 24.515625 \nQ 13.234375 26.265625 9.515625 29.90625 \nQ 5.8125 33.546875 5.8125 39.890625 \nQ 5.8125 47.609375 11.28125 51.796875 \nQ 16.75 56 26.8125 56 \nQ 31.78125 56 36.171875 55.265625 \nQ 40.578125 54.546875 44.28125 53.078125 \nz\n\" id=\"DejaVuSans-115\"/>\n      <path d=\"M 18.3125 70.21875 \nL 18.3125 54.6875 \nL 36.8125 54.6875 \nL 36.8125 47.703125 \nL 18.3125 47.703125 \nL 18.3125 18.015625 \nQ 18.3125 11.328125 20.140625 9.421875 \nQ 21.96875 7.515625 27.59375 7.515625 \nL 36.8125 7.515625 \nL 36.8125 0 \nL 27.59375 0 \nQ 17.1875 0 13.234375 3.875 \nQ 9.28125 7.765625 9.28125 18.015625 \nL 9.28125 47.703125 \nL 2.6875 47.703125 \nL 2.6875 54.6875 \nL 9.28125 54.6875 \nL 9.28125 70.21875 \nz\n\" id=\"DejaVuSans-116\"/>\n      <path d=\"M 30.609375 48.390625 \nQ 23.390625 48.390625 19.1875 42.75 \nQ 14.984375 37.109375 14.984375 27.296875 \nQ 14.984375 17.484375 19.15625 11.84375 \nQ 23.34375 6.203125 30.609375 6.203125 \nQ 37.796875 6.203125 41.984375 11.859375 \nQ 46.1875 17.53125 46.1875 27.296875 \nQ 46.1875 37.015625 41.984375 42.703125 \nQ 37.796875 48.390625 30.609375 48.390625 \nz\nM 30.609375 56 \nQ 42.328125 56 49.015625 48.375 \nQ 55.71875 40.765625 55.71875 27.296875 \nQ 55.71875 13.875 49.015625 6.21875 \nQ 42.328125 -1.421875 30.609375 -1.421875 \nQ 18.84375 -1.421875 12.171875 6.21875 \nQ 5.515625 13.875 5.515625 27.296875 \nQ 5.515625 40.765625 12.171875 48.375 \nQ 18.84375 56 30.609375 56 \nz\n\" id=\"DejaVuSans-111\"/>\n      <path d=\"M 52 44.1875 \nQ 55.375 50.25 60.0625 53.125 \nQ 64.75 56 71.09375 56 \nQ 79.640625 56 84.28125 50.015625 \nQ 88.921875 44.046875 88.921875 33.015625 \nL 88.921875 0 \nL 79.890625 0 \nL 79.890625 32.71875 \nQ 79.890625 40.578125 77.09375 44.375 \nQ 74.3125 48.1875 68.609375 48.1875 \nQ 61.625 48.1875 57.5625 43.546875 \nQ 53.515625 38.921875 53.515625 30.90625 \nL 53.515625 0 \nL 44.484375 0 \nL 44.484375 32.71875 \nQ 44.484375 40.625 41.703125 44.40625 \nQ 38.921875 48.1875 33.109375 48.1875 \nQ 26.21875 48.1875 22.15625 43.53125 \nQ 18.109375 38.875 18.109375 30.90625 \nL 18.109375 0 \nL 9.078125 0 \nL 9.078125 54.6875 \nL 18.109375 54.6875 \nL 18.109375 46.1875 \nQ 21.1875 51.21875 25.484375 53.609375 \nQ 29.78125 56 35.6875 56 \nQ 41.65625 56 45.828125 52.96875 \nQ 50 49.953125 52 44.1875 \nz\n\" id=\"DejaVuSans-109\"/>\n     </defs>\n     <use xlink:href=\"#DejaVuSans-86\"/>\n     <use x=\"60.658203\" xlink:href=\"#DejaVuSans-97\"/>\n     <use x=\"121.9375\" xlink:href=\"#DejaVuSans-114\"/>\n     <use x=\"163.050781\" xlink:href=\"#DejaVuSans-105\"/>\n     <use x=\"190.833984\" xlink:href=\"#DejaVuSans-97\"/>\n     <use x=\"252.113281\" xlink:href=\"#DejaVuSans-110\"/>\n     <use x=\"315.492188\" xlink:href=\"#DejaVuSans-99\"/>\n     <use x=\"370.472656\" xlink:href=\"#DejaVuSans-101\"/>\n     <use x=\"431.996094\" xlink:href=\"#DejaVuSans-32\"/>\n     <use x=\"463.783203\" xlink:href=\"#DejaVuSans-101\"/>\n     <use x=\"523.556641\" xlink:href=\"#DejaVuSans-120\"/>\n     <use x=\"582.736328\" xlink:href=\"#DejaVuSans-112\"/>\n     <use x=\"646.212891\" xlink:href=\"#DejaVuSans-108\"/>\n     <use x=\"673.996094\" xlink:href=\"#DejaVuSans-97\"/>\n     <use x=\"735.275391\" xlink:href=\"#DejaVuSans-105\"/>\n     <use x=\"763.058594\" xlink:href=\"#DejaVuSans-110\"/>\n     <use x=\"826.4375\" xlink:href=\"#DejaVuSans-101\"/>\n     <use x=\"887.960938\" xlink:href=\"#DejaVuSans-100\"/>\n     <use x=\"951.4375\" xlink:href=\"#DejaVuSans-32\"/>\n     <use x=\"983.224609\" xlink:href=\"#DejaVuSans-45\"/>\n     <use x=\"1019.308594\" xlink:href=\"#DejaVuSans-32\"/>\n     <use x=\"1051.095703\" xlink:href=\"#DejaVuSans-67\"/>\n     <use x=\"1120.919922\" xlink:href=\"#DejaVuSans-117\"/>\n     <use x=\"1184.298828\" xlink:href=\"#DejaVuSans-115\"/>\n     <use x=\"1236.398438\" xlink:href=\"#DejaVuSans-116\"/>\n     <use x=\"1275.607422\" xlink:href=\"#DejaVuSans-111\"/>\n     <use x=\"1336.789062\" xlink:href=\"#DejaVuSans-109\"/>\n     <use x=\"1434.201172\" xlink:href=\"#DejaVuSans-101\"/>\n     <use x=\"1495.724609\" xlink:href=\"#DejaVuSans-114\"/>\n    </g>\n   </g>\n  </g>\n </g>\n <defs>\n  <clipPath id=\"p8bf89ab15f\">\n   <rect height=\"217.44\" width=\"334.8\" x=\"30.103125\" y=\"26.877187\"/>\n  </clipPath>\n </defs>\n</svg>\n",
+      "image/png": "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\n"
+     },
+     "metadata": {
+      "needs_background": "light"
+     }
+    }
+   ],
+   "source": [
+    "import matplotlib.pyplot as plt\n",
+    "# Calculates the proportion of variance explained\\n\",\n",
+    "var_exp_cust = np.cumsum(pca.explained_variance_ratio_)\n",
+    "\n",
+    "# Plots the elbow plot for the wine pca\n",
+    "plt.plot(range(1,101), var_exp_cust, marker='o')\n",
+    "plt.title(\"Variance explained - Customer\", fontsize=18)\n",
+    "plt.axhline(0.95,c='r')\n",
+    "plt.axvline(100,c='r')\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 82,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "execute_result",
+     "data": {
+      "text/plain": [
+       "array([[ 0.04093402, -0.01991201,  0.00640173, ...,  0.08474836,\n",
+       "        -0.02163897, -0.00506853],\n",
+       "       [ 0.02462463, -0.00823965, -0.0031681 , ...,  0.0757999 ,\n",
+       "         0.02877318,  0.00410048],\n",
+       "       [-0.01776812,  0.01185988, -0.04064173, ...,  0.03049495,\n",
+       "        -0.06005005, -0.0436047 ],\n",
+       "       ...,\n",
+       "       [ 0.01544036,  0.02581317,  0.00926907, ...,  0.01944548,\n",
+       "        -0.00299436,  0.00357945],\n",
+       "       [ 0.00942636,  0.00745104,  0.00904837, ..., -0.03346577,\n",
+       "         0.00227143, -0.00336633],\n",
+       "       [ 0.0048246 ,  0.03638742, -0.03554179, ..., -0.01079161,\n",
+       "        -0.00815462, -0.00276821]])"
+      ]
+     },
+     "metadata": {},
+     "execution_count": 82
+    }
+   ],
+   "source": [
+    "pca.components_"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 84,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "PCAColNames = [f'PC{i}'for i in range(1,101)]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 85,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_final = pd.DataFrame(components,columns=PCAColNames)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 87,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "execute_result",
+     "data": {
+      "text/plain": [
+       "            PC1       PC2       PC3       PC4       PC5       PC6       PC7  \\\n",
+       "0     -1.977626  1.825183  0.503076 -0.485557 -0.994937 -0.767599  0.395538   \n",
+       "1     -1.575564  2.357389  0.382423 -0.122328 -0.477974 -0.920258  0.525485   \n",
+       "2     -1.977626  1.825183  0.503076 -0.485557 -0.994937 -0.767599  0.395538   \n",
+       "3     -1.575564  2.357389  0.382423 -0.122328 -0.477974 -0.920258  0.525485   \n",
+       "4     -1.977626  1.825183  0.503076 -0.485557 -0.994937 -0.767599  0.395538   \n",
+       "...         ...       ...       ...       ...       ...       ...       ...   \n",
+       "63376 -1.230285 -0.157273  0.657834  1.587862  0.442945  0.905503 -1.418754   \n",
+       "63377 -1.230285 -0.157273  0.657834  1.587862  0.442945  0.905503 -1.418754   \n",
+       "63378 -1.230285 -0.157273  0.657834  1.587862  0.442945  0.905503 -1.418754   \n",
+       "63379 -1.230285 -0.157273  0.657834  1.587862  0.442945  0.905503 -1.418754   \n",
+       "63380 -1.230285 -0.157273  0.657834  1.587862  0.442945  0.905503 -1.418754   \n",
+       "\n",
+       "            PC8       PC9      PC10  ...      PC91      PC92      PC93  \\\n",
+       "0     -0.408604 -0.202715 -1.568096  ... -0.027724  0.005603  0.010536   \n",
+       "1     -0.073104 -0.767145 -1.589766  ... -0.029707 -0.013750 -0.000366   \n",
+       "2     -0.408604 -0.202715 -1.568096  ... -0.027724  0.005603  0.010536   \n",
+       "3     -0.073104 -0.767145 -1.589766  ... -0.029707 -0.013750 -0.000366   \n",
+       "4     -0.408604 -0.202715 -1.568096  ... -0.027724  0.005603  0.010536   \n",
+       "...         ...       ...       ...  ...       ...       ...       ...   \n",
+       "63376 -0.243973  0.779555  1.126513  ...  0.004024  0.134080  0.104096   \n",
+       "63377 -0.243973  0.779555  1.126513  ...  0.004024  0.134080  0.104096   \n",
+       "63378 -0.243973  0.779555  1.126513  ...  0.004024  0.134080  0.104096   \n",
+       "63379 -0.243973  0.779555  1.126513  ...  0.004024  0.134080  0.104096   \n",
+       "63380 -0.243973  0.779555  1.126513  ...  0.004024  0.134080  0.104096   \n",
+       "\n",
+       "           PC94      PC95      PC96      PC97      PC98      PC99     PC100  \n",
+       "0     -0.021016 -0.000951 -0.022490  0.018597  0.006198 -0.015041  0.024270  \n",
+       "1     -0.034128  0.010614 -0.013389  0.012993 -0.001555 -0.014613  0.023920  \n",
+       "2     -0.021016 -0.000951 -0.022490  0.018597  0.006198 -0.015041  0.024270  \n",
+       "3     -0.034128  0.010614 -0.013389  0.012993 -0.001555 -0.014613  0.023920  \n",
+       "4     -0.021016 -0.000951 -0.022490  0.018597  0.006198 -0.015041  0.024270  \n",
+       "...         ...       ...       ...       ...       ...       ...       ...  \n",
+       "63376 -0.046138 -0.128922  0.155612  0.252449 -0.188281  0.091403 -0.126358  \n",
+       "63377 -0.046138 -0.128922  0.155612  0.252449 -0.188281  0.091403 -0.126358  \n",
+       "63378 -0.046138 -0.128922  0.155612  0.252449 -0.188281  0.091403 -0.126358  \n",
+       "63379 -0.046138 -0.128922  0.155612  0.252449 -0.188281  0.091403 -0.126358  \n",
+       "63380 -0.046138 -0.128922  0.155612  0.252449 -0.188281  0.091403 -0.126358  \n",
+       "\n",
+       "[63381 rows x 100 columns]"
+      ],
+      "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>PC1</th>\n      <th>PC2</th>\n      <th>PC3</th>\n      <th>PC4</th>\n      <th>PC5</th>\n      <th>PC6</th>\n      <th>PC7</th>\n      <th>PC8</th>\n      <th>PC9</th>\n      <th>PC10</th>\n      <th>...</th>\n      <th>PC91</th>\n      <th>PC92</th>\n      <th>PC93</th>\n      <th>PC94</th>\n      <th>PC95</th>\n      <th>PC96</th>\n      <th>PC97</th>\n      <th>PC98</th>\n      <th>PC99</th>\n      <th>PC100</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>-1.977626</td>\n      <td>1.825183</td>\n      <td>0.503076</td>\n      <td>-0.485557</td>\n      <td>-0.994937</td>\n      <td>-0.767599</td>\n      <td>0.395538</td>\n      <td>-0.408604</td>\n      <td>-0.202715</td>\n      <td>-1.568096</td>\n      <td>...</td>\n      <td>-0.027724</td>\n      <td>0.005603</td>\n      <td>0.010536</td>\n      <td>-0.021016</td>\n      <td>-0.000951</td>\n      <td>-0.022490</td>\n      <td>0.018597</td>\n      <td>0.006198</td>\n      <td>-0.015041</td>\n      <td>0.024270</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>-1.575564</td>\n      <td>2.357389</td>\n      <td>0.382423</td>\n      <td>-0.122328</td>\n      <td>-0.477974</td>\n      <td>-0.920258</td>\n      <td>0.525485</td>\n      <td>-0.073104</td>\n      <td>-0.767145</td>\n      <td>-1.589766</td>\n      <td>...</td>\n      <td>-0.029707</td>\n      <td>-0.013750</td>\n      <td>-0.000366</td>\n      <td>-0.034128</td>\n      <td>0.010614</td>\n      <td>-0.013389</td>\n      <td>0.012993</td>\n      <td>-0.001555</td>\n      <td>-0.014613</td>\n      <td>0.023920</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>-1.977626</td>\n      <td>1.825183</td>\n      <td>0.503076</td>\n      <td>-0.485557</td>\n      <td>-0.994937</td>\n      <td>-0.767599</td>\n      <td>0.395538</td>\n      <td>-0.408604</td>\n      <td>-0.202715</td>\n      <td>-1.568096</td>\n      <td>...</td>\n      <td>-0.027724</td>\n      <td>0.005603</td>\n      <td>0.010536</td>\n      <td>-0.021016</td>\n      <td>-0.000951</td>\n      <td>-0.022490</td>\n      <td>0.018597</td>\n      <td>0.006198</td>\n      <td>-0.015041</td>\n      <td>0.024270</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>-1.575564</td>\n      <td>2.357389</td>\n      <td>0.382423</td>\n      <td>-0.122328</td>\n      <td>-0.477974</td>\n      <td>-0.920258</td>\n      <td>0.525485</td>\n      <td>-0.073104</td>\n      <td>-0.767145</td>\n      <td>-1.589766</td>\n      <td>...</td>\n      <td>-0.029707</td>\n      <td>-0.013750</td>\n      <td>-0.000366</td>\n      <td>-0.034128</td>\n      <td>0.010614</td>\n      <td>-0.013389</td>\n      <td>0.012993</td>\n      <td>-0.001555</td>\n      <td>-0.014613</td>\n      <td>0.023920</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>-1.977626</td>\n      <td>1.825183</td>\n      <td>0.503076</td>\n      <td>-0.485557</td>\n      <td>-0.994937</td>\n      <td>-0.767599</td>\n      <td>0.395538</td>\n      <td>-0.408604</td>\n      <td>-0.202715</td>\n      <td>-1.568096</td>\n      <td>...</td>\n      <td>-0.027724</td>\n      <td>0.005603</td>\n      <td>0.010536</td>\n      <td>-0.021016</td>\n      <td>-0.000951</td>\n      <td>-0.022490</td>\n      <td>0.018597</td>\n      <td>0.006198</td>\n      <td>-0.015041</td>\n      <td>0.024270</td>\n    </tr>\n    <tr>\n      <th>...</th>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n    </tr>\n    <tr>\n      <th>63376</th>\n      <td>-1.230285</td>\n      <td>-0.157273</td>\n      <td>0.657834</td>\n      <td>1.587862</td>\n      <td>0.442945</td>\n      <td>0.905503</td>\n      <td>-1.418754</td>\n      <td>-0.243973</td>\n      <td>0.779555</td>\n      <td>1.126513</td>\n      <td>...</td>\n      <td>0.004024</td>\n      <td>0.134080</td>\n      <td>0.104096</td>\n      <td>-0.046138</td>\n      <td>-0.128922</td>\n      <td>0.155612</td>\n      <td>0.252449</td>\n      <td>-0.188281</td>\n      <td>0.091403</td>\n      <td>-0.126358</td>\n    </tr>\n    <tr>\n      <th>63377</th>\n      <td>-1.230285</td>\n      <td>-0.157273</td>\n      <td>0.657834</td>\n      <td>1.587862</td>\n      <td>0.442945</td>\n      <td>0.905503</td>\n      <td>-1.418754</td>\n      <td>-0.243973</td>\n      <td>0.779555</td>\n      <td>1.126513</td>\n      <td>...</td>\n      <td>0.004024</td>\n      <td>0.134080</td>\n      <td>0.104096</td>\n      <td>-0.046138</td>\n      <td>-0.128922</td>\n      <td>0.155612</td>\n      <td>0.252449</td>\n      <td>-0.188281</td>\n      <td>0.091403</td>\n      <td>-0.126358</td>\n    </tr>\n    <tr>\n      <th>63378</th>\n      <td>-1.230285</td>\n      <td>-0.157273</td>\n      <td>0.657834</td>\n      <td>1.587862</td>\n      <td>0.442945</td>\n      <td>0.905503</td>\n      <td>-1.418754</td>\n      <td>-0.243973</td>\n      <td>0.779555</td>\n      <td>1.126513</td>\n      <td>...</td>\n      <td>0.004024</td>\n      <td>0.134080</td>\n      <td>0.104096</td>\n      <td>-0.046138</td>\n      <td>-0.128922</td>\n      <td>0.155612</td>\n      <td>0.252449</td>\n      <td>-0.188281</td>\n      <td>0.091403</td>\n      <td>-0.126358</td>\n    </tr>\n    <tr>\n      <th>63379</th>\n      <td>-1.230285</td>\n      <td>-0.157273</td>\n      <td>0.657834</td>\n      <td>1.587862</td>\n      <td>0.442945</td>\n      <td>0.905503</td>\n      <td>-1.418754</td>\n      <td>-0.243973</td>\n      <td>0.779555</td>\n      <td>1.126513</td>\n      <td>...</td>\n      <td>0.004024</td>\n      <td>0.134080</td>\n      <td>0.104096</td>\n      <td>-0.046138</td>\n      <td>-0.128922</td>\n      <td>0.155612</td>\n      <td>0.252449</td>\n      <td>-0.188281</td>\n      <td>0.091403</td>\n      <td>-0.126358</td>\n    </tr>\n    <tr>\n      <th>63380</th>\n      <td>-1.230285</td>\n      <td>-0.157273</td>\n      <td>0.657834</td>\n      <td>1.587862</td>\n      <td>0.442945</td>\n      <td>0.905503</td>\n      <td>-1.418754</td>\n      <td>-0.243973</td>\n      <td>0.779555</td>\n      <td>1.126513</td>\n      <td>...</td>\n      <td>0.004024</td>\n      <td>0.134080</td>\n      <td>0.104096</td>\n      <td>-0.046138</td>\n      <td>-0.128922</td>\n      <td>0.155612</td>\n      <td>0.252449</td>\n      <td>-0.188281</td>\n      <td>0.091403</td>\n      <td>-0.126358</td>\n    </tr>\n  </tbody>\n</table>\n<p>63381 rows × 100 columns</p>\n</div>"
+     },
+     "metadata": {},
+     "execution_count": 87
+    }
+   ],
+   "source": [
+    "X_final"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 56,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_final.to_csv('/Users/zumiis/bootcamp_git/midterm/vscode_files/X_for_testing.csv')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 91,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.model_selection import train_test_split\n",
+    "X_train,X_test,y_train,y_test = train_test_split(X_final,y,train_size=0.8)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 93,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.linear_model import Ridge\n",
+    "from sklearn.metrics import mean_absolute_error,mean_squared_error,r2_score"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 95,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "execute_result",
+     "data": {
+      "text/plain": [
+       "GridSearchCV(estimator=Ridge(), n_jobs=-1,\n",
+       "             param_grid={'alpha': [10, 20, 50, 200, 300, 400, 500]})"
+      ]
+     },
+     "metadata": {},
+     "execution_count": 95
+    }
+   ],
+   "source": [
+    "from sklearn.model_selection import GridSearchCV\n",
+    "params = {'alpha':[10,20,50,200,300,400,500]}\n",
+    "clf_ridge = GridSearchCV(estimator=Ridge(), param_grid=params, n_jobs=-1)\n",
+    "clf_ridge.fit(X_train, y_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 96,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "execute_result",
+     "data": {
+      "text/plain": [
+       "Ridge(alpha=10)"
+      ]
+     },
+     "metadata": {},
+     "execution_count": 96
+    }
+   ],
+   "source": [
+    "clf_ridge.best_estimator_"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 97,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "execute_result",
+     "data": {
+      "text/plain": [
+       "0.4172336386547134"
+      ]
+     },
+     "metadata": {},
+     "execution_count": 97
+    }
+   ],
+   "source": [
+    "clf_ridge.best_score_"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ]
+}
